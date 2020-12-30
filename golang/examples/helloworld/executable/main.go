@@ -1,4 +1,4 @@
-package executable
+package main
 
 func main() {
 
