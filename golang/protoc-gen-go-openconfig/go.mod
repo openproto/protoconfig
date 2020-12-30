@@ -1,4 +1,4 @@
-module github.com/thanos-io/OpenConfig/go/protoc-gen-go-openconfig
+module github.com/thanos-io/OpenConfig/golang/protoc-gen-go-openconfig
 
 go 1.15
 
