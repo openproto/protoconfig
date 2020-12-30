@@ -1,0 +1,5 @@
+package executable
+
+func main() {
+
+}
