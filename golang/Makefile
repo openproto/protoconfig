@@ -44,8 +44,11 @@ proto: build $(PROTOC) $(PROTOC_GEN_GO)
 	@mkdir -p $(TMP_GOBIN)
 	@cp $(PROTOC_GEN_GO) $(PROTOC_GEN_GO_CURRENT)
 	@echo ">> generating $(REPO_ROOT_DIR)/examples/helloworld/helloworld.proto in $(REPO_ROOT_DIR)/go/examples/helloworld/"
-	@PATH=$(GOBIN):$(TMP_GOBIN) $(PROTOC) -I $(REPO_ROOT_DIR)/examples/helloworld --go_out=./examples/helloworld/ --go_opt=paths=source_relative \
-	   --go-openconfig_out=./examples/helloworld/ --go-openconfig_opt=paths=source_relative \
+	@PATH=$(GOBIN):$(TMP_GOBIN) $(PROTOC) \
+		-I $(REPO_ROOT_DIR)/examples/helloworld \
+		-I $(REPO_ROOT_DIR) \
+		--go_out=./examples/helloworld/ --go_opt=paths=source_relative \
+	   	--go-openconfig_out=./examples/helloworld/ --go-openconfig_opt=paths=source_relative \
 	    $(REPO_ROOT_DIR)/examples/helloworld/helloworld.proto
 
 .PHONY: check-git

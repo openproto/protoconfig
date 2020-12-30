@@ -4,7 +4,16 @@ Prototype of open standard for generating, defining and parsing configuration in
 
 ## Motivation
 
+TBD 
+
 ## Principles
+
+TBD, notes:
+
+* Executor
+* Executable
+
+Version?
 
 ## Quick Start
 
@@ -38,35 +47,46 @@ For installation instructions, see [Protocol Buffer Compiler Installation](https
 
 #### Run example
 
-1. Change directory to the quick start example directory:
-
-`cd examples/helloword`
-
-TBD
-
-#### Generate example config
-
-1. Change directory to the quick start example directory:
-
-`cd examples/helloword`
-
-2. From the `examples/helloworld` directory, generate Go code for using and parsing configuration defined in proto file.
-
+1. Read the OpenConfig spec for helloworld project (from repo root): `examples/helloworld/helloworld.proto`
+2. This example has already generated Go code from this spec, you can read it: `golang/examples/helloworld/hellworld.pb.go` and `golang/examples/helloworld/hellworld_openconfig.pb.go`
+3. Change directory to the quick start example directory for Go `cd golang/examples/helloworld`
+4. Go example contains two binaries that are already importing and using generated code `./executor` and `./executable`
+5. Run `go run ./executable --help` and `go run ./executable hello --help` to see the example executable help output of the available configuration options. Now if you look on Go code for this (`./executable/main.go`) you will that most of the parsing code is actually generated from OpenConfig proto. 
+6. Feel free to run executable with any parameters you want. Executable will execute all as spec and help specifies. For example you can run: 
+   
 ```bash
-protoc --go_out=. --go_opt=paths=source_relative \
---go-grpc_out=. --go-grpc_opt=paths=source_relative \
-helloworld/helloworld.proto
+go run ./executable hello --world="my" --year=2021 --name="Kate B" --lang=ENGLISH --add-really
 ```
 
+The above should print ``
 
+7. This is not everything. Spec and this Go binding allows to generate nice executor (Go client of executable). You can see executor using
+generated executor logic in `./executor/main.go`.
+8. Feel free to play with `./executor/main.go` and run it with `go run ./executor`. It will invoke the executable with chosen (typed!) parameters,
 
-$ go run greeter_server/main.go
-From a different terminal, compile and execute the client code to see the client output:
+#### Updating & Generating example OpenConfig Spec
 
-$ go run greeter_client/main.go
-Greeting: Hello world
+Let's now try to change the spec and re-generate Go code. This allows our Go executor and executable implementations to use it immediately
+
+1. Modify `examples/helloworld/helloworld.proto`. Let's remove X
+2. From the `go` directory run `make proto`. 
+   
+To see what it does you can check `golang/Makefile` `proto` target:
+
+```Makefile
+	@echo ">> generating $(REPO_ROOT_DIR)/examples/helloworld/helloworld.proto in $(REPO_ROOT_DIR)/golang/examples/helloworld/"
+	@PATH=$(GOBIN):$(TMP_GOBIN) $(PROTOC) -I $(REPO_ROOT_DIR)/examples/helloworld \
+		--go_out=./examples/helloworld/ --go_opt=paths=source_relative \
+	   	--go-openconfig_out=./examples/helloworld/ --go-openconfig_opt=paths=source_relative \
+	    $(REPO_ROOT_DIR)/examples/helloworld/helloworld.proto
+```
+
+This makefile snippet generates the code from proto to our `golang/example/helloworld` directory. It has to have `protoc`, `protoc-gen-go`
+and `protoc-gen-openconfig` binaries installed (I know that's bit a lot 💩 - complains should go to profobuf ecosystem)
+
+3. Once generated repeat same process with running executable and executor as previously.
 
 ## Initial Authors
 
-Bartek Płotka @bwplotka
-Frederic Branczyk @brancz
+* Bartek Płotka @bwplotka
+* Frederic Branczyk @brancz
