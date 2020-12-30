@@ -18,7 +18,7 @@ all: format build
 .PHONY: build
 build: ## Build protoc-gen-go-openconfig.
 	@echo ">> building $(MODULE_GEN_GO)"
-	@cd $(MODULE_GEN_GO) && GOBIN=$(GOBIN) go install github.com/thanos-io/OpenConfig/go/protoc-gen-go-openconfig
+	@cd $(MODULE_GEN_GO) && GOBIN=$(GOBIN) go install github.com/thanos-io/OpenConfig/golang/protoc-gen-go-openconfig
 
 .PHONY: deps
 deps: ## Ensures fresh go.mod and go.sum.
@@ -49,7 +49,7 @@ proto: ## Generated golang protobuf
 proto: build $(PROTOC) $(PROTOC_GEN_GO)
 	@mkdir -p $(TMP_GOBIN)
 	@cp $(PROTOC_GEN_GO) $(PROTOC_GEN_GO_CURRENT)
-	@echo ">> generating $(REPO_ROOT_DIR)/examples/helloworld/helloworld.proto in $(REPO_ROOT_DIR)/go/examples/helloworld/"
+	@echo ">> generating $(REPO_ROOT_DIR)/examples/helloworld/helloworld.proto in $(REPO_ROOT_DIR)/golang/examples/helloworld/"
 	@PATH=$(GOBIN):$(TMP_GOBIN) $(PROTOC) \
 		-I $(REPO_ROOT_DIR)/examples/helloworld \
 		-I $(REPO_ROOT_DIR) \
