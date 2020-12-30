@@ -28,7 +28,7 @@ jobs:
       - name: Linting & vetting.
         env:
           GOBIN: /tmp/.bin
-        run: cd protoc-gen-go-openconfig && make lint
+        run: cd golang && make lint
   tests:
     runs-on: ${{ matrix.platform }}
     strategy:
@@ -55,4 +55,4 @@ jobs:
       - name: Run unit tests.
         env:
           GOBIN: /tmp/.bin
-        run: cd protoc-gen-go-openconfig && make test
+        run: cd golang && make test

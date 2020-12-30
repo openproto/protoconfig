@@ -1,5 +1,0 @@
-package executable
-
-func main() {
-
-}
