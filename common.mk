@@ -1,8 +1,10 @@
 REPO_ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 # Tools.
-PROTOC            ?= $(GOBIN)/protoc-$(PROTOC_VERSION)
-PROTOC_VERSION    ?= 3.14.0
+PROTO_DESCRIPTOR_FILE ?= $(REPO_ROOT_DIR)/google_protobuf_descriptor.proto
+PROTOC                ?= $(GOBIN)/protoc-$(PROTOC_VERSION)
+PROTOC_VERSION        ?= 3.14.0
+
 GIT ?= $(shell which git)
 TMP_PATH ?= /tmp
 
@@ -35,12 +37,16 @@ help: ## Displays help.
 .PHONY: protoc  ## Installs proto.
 protoc: $(PROTOC)
 
-$(PROTOC):
+$(PROTOC): $(PROTO_DESCRIPTOR_FILE)
 	@mkdir -p $(TMP_PATH)
 	@echo ">> fetching protoc install script from Thanos repo"
-	@cd $(TMP_PATH) && wget -O https://raw.githubusercontent.com/thanos-io/thanos/master/scripts/installprotoc.sh && chmod +x installprotoc.sh
+	@cd $(TMP_PATH) && wget --output-document=installprotoc.sh https://raw.githubusercontent.com/thanos-io/thanos/master/scripts/installprotoc.sh && chmod +x installprotoc.sh
 	@echo ">> fetching protoc@${PROTOC_VERSION}"
 	@PROTOC_VERSION="$(PROTOC_VERSION)" TMP_GOPATH="$(TMP_PATH)" $(TMP_PATH)/installprotoc.sh
 	@echo ">> installing protoc@${PROTOC_VERSION}"
 	@mv -- "$(TMP_PATH)/bin/protoc" "$(GOBIN)/protoc-$(PROTOC_VERSION)"
 	@echo ">> produced $(GOBIN)/protoc-$(PROTOC_VERSION)"
+
+$(PROTO_DESCRIPTOR_FILE): $(REPO_ROOT_DIR)/common.mk
+	@echo ">> fetching descriptor.proto that matches protoc version $(PROTOC_VERSION) as $(PROTO_DESCRIPTOR_FILE)"
+	@wget --output-document="$(PROTO_DESCRIPTOR_FILE)" "https://raw.githubusercontent.com/protocolbuffers/protobuf/v$(PROTOC_VERSION)/src/google/protobuf/descriptor.proto"
