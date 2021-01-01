@@ -1,0 +1,18 @@
+version: v1beta1
+build:
+  roots:
+    - proto
+lint:
+  ignore_only:
+    # Note recommended but Go looks nicer with this.
+    ENUM_VALUE_PREFIX:
+      - examples/helloworld/v1/helloworld.proto
+    ENUM_ZERO_VALUE_SUFFIX:
+      - examples/helloworld/v1/helloworld.proto
+  ignore:
+    # per the lint configuration docs, the paths for lint ignores have the root
+    # directory stripped so that this configuration works for both sources and images
+    # google/api and google/rpc are the directories within googleapis/ that we want to ignore
+    - google/protobuf/descriptor.proto
+  use:
+    - DEFAULT

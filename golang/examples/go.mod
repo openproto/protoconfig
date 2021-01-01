@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/golang/protobuf v1.4.3
-	github.com/thanos-io/OpenConfig/golang v0.0.0-20201230221506-feea1e3c8bd7 // indirect
+	github.com/thanos-io/OpenConfig/golang v0.0.0-00010101000000-000000000000
 	google.golang.org/protobuf v1.25.0
 )
 

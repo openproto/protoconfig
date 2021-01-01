@@ -1,9 +1,10 @@
 REPO_ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 # Tools.
-PROTO_DESCRIPTOR_FILE ?= $(REPO_ROOT_DIR)/google_protobuf_descriptor.proto
-PROTOC                ?= $(GOBIN)/protoc-$(PROTOC_VERSION)
-PROTOC_VERSION        ?= 3.14.0
+PROTO_DESCRIPTOR_FILE ?= $(REPO_ROOT_DIR)/proto/google/protobuf/descriptor.proto
+
+# buf-v0.33.0 protoc --version prints 3.13.0-buf
+PROTOC_VERSION        ?= "3.13.0"
 
 GIT ?= $(shell which git)
 TMP_PATH ?= /tmp
@@ -33,19 +34,6 @@ endef
 
 help: ## Displays help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-
-.PHONY: protoc  ## Installs proto.
-protoc: $(PROTOC)
-
-$(PROTOC): $(PROTO_DESCRIPTOR_FILE)
-	@mkdir -p $(TMP_PATH)
-	@echo ">> fetching protoc install script from Thanos repo"
-	@cd $(TMP_PATH) && wget --output-document=installprotoc.sh https://raw.githubusercontent.com/thanos-io/thanos/master/scripts/installprotoc.sh && chmod +x installprotoc.sh
-	@echo ">> fetching protoc@${PROTOC_VERSION}"
-	@PROTOC_VERSION="$(PROTOC_VERSION)" TMP_GOPATH="$(TMP_PATH)" $(TMP_PATH)/installprotoc.sh
-	@echo ">> installing protoc@${PROTOC_VERSION}"
-	@mv -- "$(TMP_PATH)/bin/protoc" "$(GOBIN)/protoc-$(PROTOC_VERSION)"
-	@echo ">> produced $(GOBIN)/protoc-$(PROTOC_VERSION)"
 
 $(PROTO_DESCRIPTOR_FILE): $(REPO_ROOT_DIR)/common.mk
 	@echo ">> fetching descriptor.proto that matches protoc version $(PROTOC_VERSION) as $(PROTO_DESCRIPTOR_FILE)"
