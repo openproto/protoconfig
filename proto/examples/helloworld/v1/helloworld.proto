@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+import "openconfig/v1/extensions.proto";
+
+option go_package = "github.com/thanos-io/OpenConfig/golang/examples/helloworld;helloworldpb";
+option java_multiple_files = true;
+option java_package = "com.github.openconfig.examples.helloworld";
+option java_outer_classname = "HelloWorldProto";
+
+package examples.helloworld.v1;
+
+message HelloWorldApp {
+    option (openconfig.v1.configuration) = {
+        name: "helloworld"
+        version: "0.1.0"
+        description: "example application to showcase OpenConfig 1.0."
+    };
+    oneof command {
+        HelloCommand hello = 2;
+        ByeCommand bye = 3;
+    }
+}
+
+enum Lang {
+    UNSPECIFIED = 0;
+    ENGLISH = 1;
+    POLISH  = 2;
+    GERMAN  = 3;
+}
+
+message HelloCommand {
+    string name = 1 [(openconfig.v1.required) = true];
+    int64 year = 2 [(openconfig.v1.default) = "2021"];
+    string world = 3;
+    Lang lang = 4;
+
+    bool please_add_really = 5 [deprecated = true];
+    bool add_really = 6 [(openconfig.v1.hidden) = true];
+}
+
+message ByeCommand {
+    Lang lang = 1;
+    oneof command {
+        ByeWorldCommand world = 2;
+        ByeConfigurableCommand just = 3;
+    }
+}
+
+message ByeWorldCommand {}
+
+message ByeConfigurableCommand {
+    string arg = 2;
+    ByeConfiguration config = 1;
+}
+
+message ByeResponse {
+    string response = 1;
+    bool capitalized = 2;
+}
+
+message ByeConfiguration {
+    map<string, ByeResponse> configs = 2;
+}

@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+// OpenConfig Proto Extensions Format 1.0.
+//
+// This defines extensions to protocol-buffer-compatible language that is build on proto version 3 with protobuf custom options.
+//
+// OpenConfig Extensions allows software authors to define metadata about required configuration like default values or field
+// optionality etc.
+//
+// Extension can be used as natively described in https://developers.google.com/protocol-buffers/docs/proto#customoptions
+//
+// Below extensions are not mandatory to use while defining your configuration, but mandatory to be implemented by
+// OpenConfig 1.0 compatible parsers and generators.
+package openconfig.v1;
+
+option go_package = "github.com/thanos-io/OpenConfig/golang";
+
+import "google/protobuf/descriptor.proto";
+
+message Configuration {
+    string name = 1;
+    string version = 2;
+    string description = 3;
+}
+
+extend google.protobuf.MessageOptions {
+    Configuration configuration = 5000;
+}
+
+extend google.protobuf.FieldOptions {
+    string default = 5000;
+    bool hidden   = 5001;
+    bool required = 5002;
+}

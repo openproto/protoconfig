@@ -1,4 +1,3 @@
-
 //  protoc-gen-go-openconfig is a plugin for the Google protocol buffer compiler to
 // generate Go code. Install it by building this program and making it
 // accessible within your PATH with the name:
