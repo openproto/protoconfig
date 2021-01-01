@@ -13,7 +13,7 @@ syntax = "proto3";
 // OpenConfig 1.0 compatible parsers and generators.
 package openconfig.v1;
 
-option go_package = "github.com/thanos-io/OpenConfig/golang";
+option go_package = "github.com/thanos-io/OpenConfig/golang;openconfig";
 
 import "google/protobuf/descriptor.proto";
 

@@ -14,18 +14,19 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
-const version = "0.0.1"
+const version = "0.1.0"
 
 func main() {
 	showVersion := flag.Bool("version", false, "print the version and exit")
 	flag.Parse()
 	if *showVersion {
-		fmt.Printf("protoc-gen-go-grpc %v\n", version)
+		fmt.Fprintf(os.Stdout, "protoc-gen-go-grpc %v\n", version)
 		return
 	}
 
@@ -38,7 +39,9 @@ func main() {
 			if !f.Generate {
 				continue
 			}
-			generateFile(gen, f)
+			if err := generateGoOpenConfig(gen, f); err != nil {
+				return err
+			}
 		}
 		return nil
 	})

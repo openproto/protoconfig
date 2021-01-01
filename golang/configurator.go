@@ -1,1 +1,1 @@
-package golang
+package openconfig
