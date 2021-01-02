@@ -1,4 +1,4 @@
 package openconfig
 
-type CLI interface {
+type ArgumentsParser interface {
 }

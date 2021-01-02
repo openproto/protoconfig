@@ -17,18 +17,31 @@ option go_package = "github.com/thanos-io/OpenConfig/golang;openconfig";
 
 import "google/protobuf/descriptor.proto";
 
-message Configuration {
+// TODO(bwplotka): Make it non pointers (in Go).
+message Metadata {
     string name = 1;
     string version = 2;
     string description = 3;
+
+    oneof delivery_mechanism {
+        StdinDelivery stdin_delivery = 101;
+        FlagDelivery flag_delivery = 102;
+    }
+}
+
+message StdinDelivery {}
+
+message FlagDelivery {
+    string name = 1;
 }
 
 extend google.protobuf.MessageOptions {
-    Configuration configuration = 5000;
+    Metadata metadata = 5000;
 }
 
 extend google.protobuf.FieldOptions {
     string default = 5000;
     bool hidden   = 5001;
     bool required = 5002;
+
 }

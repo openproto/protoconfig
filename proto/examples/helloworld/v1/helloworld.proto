@@ -9,12 +9,15 @@ option java_outer_classname = "HelloWorldProto";
 
 package examples.helloworld.v1;
 
-message HelloWorldApp {
-    option (openconfig.v1.configuration) = {
-        name: "helloworld"
+message HelloWorld {
+    option (openconfig.v1.metadata) = {
+        name: "configurable"
         version: "0.1.0"
         description: "example application to showcase OpenConfig 1.0."
+
+        flag_delivery: { name: "--openconfigv1" }
     };
+
     oneof command {
         HelloCommand hello = 2;
         ByeCommand bye = 3;
