@@ -1,178 +1,59 @@
-# OpenConfig
+# OpenConfig 1.0
 
-`OpenConfig 1.0` standard specifies a process of using, defining and consuming software configuration input in a way that is:
+The `OpenConfig 1.0` standard specifies a process of using, defining and consuming software configuration input in a unified way.
 
-* Configuration that is **Discoverable** and **Type Safe**
+*`OpenConfig 1.0`  is like gRPC or OpenAPI but for Application (static or dynamic) Configuration.*
 
-We don't need to guess or read complex documentations in order to know application configuration format, invariants and assumptions
+### Tl;DR
 
-> Configuration is defined by a single, typed [proto](https://developers.google.com/protocol-buffers) package.
+1. Application developer creates a [.proto](https://developers.google.com/protocol-buffers) files with Configuration Definition, tha defines how to control the application. It's the single source of truth. 
+2. Thanks to proto, developer can generate a data structure in the language they need. Such structs/classes can be then used to parse incoming input of bytes in native proto or JSON encoding (for example from stdin, CLI flag or HTTP API, etc).
+3. `OpenConfig` allows generation extensibility, so such definition can be also used to generate documentation, `--help`, `man`, custom types or even whole CLI flag & args parsing. Options are unlimited. 
+4. Following `OpenConfig` specification, human or program can now configure the application either by specifying JSON manually or by generating (again) data structure from `Configuration Proto Definition) in the programming they want. Such struct/class is typed (if language is typed), have valid format, have help commentaries and can be encoded to protobuf supported format and passed to the `configurable` application!
 
-* **Auto Generation**
-  
-We don't need manually write application client and application CLI / Configuration definitions, or even documentation (!).
-All can be safely generated thanks to protobuf and plugin ecosystem
+`OpenConfig 1.0` standard specifies that every `OpenConfig 1.0` compatible application accepts encoded protobuf in proto or JSON format as the way of configuring itself. Either as the only way or additionally to other conventions (e.g args and flags).
 
-> Similar to `client` and `server` generation in gRPC or OpenAPI 💪
+![Open Config 1.0](https://docs.google.com/drawings/d/e/2PACX-1vSANZkljSiDgV-o0a-dL0ryZz19p3Hblt5V_qozhBcY5ILq8j3T2GEAdCCHFHoSGT9h2H4LDqJ9bCn_/pub?w=1440&h=1080)
 
-* **Easy to Verify**
+### Goals
 
-Non-semantic verification and validation (e.g ) does not require executable participation.
+Configure software in a way that is:
 
-> No need for CLI --dry-run logic, or even invoking anything external. All can be validated from the point of protobuf.
+* **Discoverable** and **Type Safe**: *We don't need to guess or read complex documentations in order to know application configuration format, invariants and assumptions Configuration is defined by a single, typed [proto](https://developers.google.com/protocol-buffers) package.*
+* **Allows Auto Generation**: *We don't need manually implement application client or data format to encode and similarly data format to parse. All can be safely generated thanks to protobuf in almost any programming language, thanks to wide plugin ecosystem. Additionally, you can generate a full CLI flag paring code or even documentation(!). It also means the smallest, possible impact in the event of application upgrade of modification. Type, Default or even Help changed can be easily tracked in any language.*
+* **Easy to Verify**: *Non-semantic verification and validation (e.g ) does not require executable participation. No need for CLI --dry-run logic, or even invoking anything external. All can be validated from the point of protobuf.*
+* **Backward & Forward Compatible**: *Smooth version migrations, thanks to protobuf guarantee and safety checkers like [`buf check breaking`](https://docs.buf.build/breaking-usage)*
+* **Extensible**: *On top of [**OpenConfig Proto Extensions Format 1.0.**](proto/openconfig/v1/extensions.proto) this specification allows CLI or language-specific extensions (e.g see [`kingpinv2` Go package](golang/kingpinv2) and its [extensions](golang/kingpinv2/proto/openconfig/kingpinv2/v1/extensions.proto))*
 
-* **Maintainable**
-  
-Smallest, possible impact in the event of application upgrade of modification. Type, Default or even Help changed can be tracked in
-any language.
-
-* **Backward & Forward Compatible** 
-  
-Smooth version migrations, thanks to protobuf guarantee and safety checkers like [`buf check breaking`](https://docs.buf.build/breaking-usage)
-
-## Motivation
+### Motivation
 
 See ["Configuration in 2021 is still broken"](https://deploy-preview-26--bwplotka.netlify.app/2020/configuring-sw-is-broken/)
 
-## Spec TL;DR
-
 ### Principles
 
-Software `configuration` is a process of passing information to the software in order to change its behavior without recompilation or sometimes even without restarting (dynamic configuration).  
+See [./specification#principles](specification.md#principles).
 
-Two main sides exists during software configuration process:
+### Why Protocol Buffers and What is it
 
-* `Configurable`: Software we want to configure, statically (during startup) or dynamically (on the run)
-* `Configurator`: Another software or human user that desire to configure the `Configurable` automatically or manually (human).
+See [./specification#why-protocol-buffers](specification.md#why-protocol-buffers)
 
-The key element of `OpenConfig` specification is a strict format and rules of the `Configuration Definition`. This definition is the true single language that both `Configurator` and `Configurable` can use as shown on below diagram:
+### Example
 
-<div class="bg-gray">
-<img src="https://docs.google.com/drawings/d/e/PACX-1vSANZkljSiDgV-o0a-dL0ryZz19p3Hblt5V_qozhBcY5ILq8j3T2GEAdCCHFHoSGT9h2H4LDqJ9bCn_/pub?w=1440&h=1080"/>
-</div>
+See [example in Go](golang/README.md).
 
-`OpenConfig 1.0` standard specifies that, in order for a `Configurable` (Software) to be `OpenConfig 1.0` compliant, it shall have one `Configuration Proto Definition`, which shall be the [source of truth](https://en.wikipedia.org/wiki/Single_source_of_truth) of its configuration input. Such a `Configuration Proto Definition` (called further `CPD`) shall meet following requirements:
+If you are not familiar with Go, this is still useful example, as the flow and pattern will be similar for any language.
 
-* Shall be stored and versioned together with the software itself (e.g in the same repository).
-* Shall be compatible with [Protocol Buffer Version 3](https://developers.google.com/protocol-buffers/docs/reference/proto3-spec) specification.
-* Shall define all the configuration options the `Configurable` exposes.
-* Can use [**OpenConfig Proto Extensions Format 1.0.**](proto/openconfig/v1/extensions.proto) which might be useful for more advanced configuration options.
-* Can use any other [proto](https://developers.google.com/protocol-buffers) extension or important one or more `CPD` from other software.
-
-Furthermore, additionally to `CPD`, the `OpenConfig 1.0` specifies the `Encoded Configuration Message` (called further `ECM`), which is a configuration information serialized into stream of bytes in [`protobuf "byte" encoding`](https://developers.google.com/protocol-buffers/docs/encoding) or [`json encoding`](https://developers.google.com/protocol-buffers/docs/proto3#json) format based on specific `Configuration Proto Definition (CPD)`.
-
-`OpenConfig 1.0` specifies `Configuration Process` as passing the `Encoded Configuration Message (ECM)` to `Configurable` in order to control programmed options it exposes.
-If the `ECM` is passed and parsed on the start of the application before anything else (e.g starting functionalities) it's called `Static Configuration Process (SCP)`. For example reading `ECM` from file on start or reading `ECM` from CLI flag. If `ECM` is passed and configuration is performed during further execution of the `Configurable` execution it's called `Dynamic Configuration Process (DCP)` Watching the file with `ECM` for modify events and reloading internal components when those occur based on new `ECM` input, or accepting `ECM` on HTTP endpoint are examples of `DCP`.
-
-The `Configurable` shall implement either `SCP` or `DCP` or both. `SCP` is recommended for simplicity, explicitness and lower complexity on `Configurable` side reasons.
-In any case, the `Configurable` shall accept the `ECM` based on its `CPD`, decode it based on its `CPD` and use parsed data to control programmed options. Note that this specification does not force any consumption mechanism as long as there is one.
-
-Additionally:
-
-* [`json encoding`](https://developers.google.com/protocol-buffers/docs/proto3#json) shall be supported.
-* [`protobuf "byte" encoding`](https://developers.google.com/protocol-buffers/docs/encoding) can be supported, but it's recommended to not use it for most of the cases. Reason is that configuration has to be verbose, simple and explicit. Ideally, software is configured statically on the start and all its configuration is visible with a quick glance on CLI invocation. See further rationales [here](https://www.bwplotka.dev/2020/flagarize/#flags-ftw).
-* `Configurable` should accept empty or partially empty `ECM` by providing safe and minimalistic defaults.
-
-Overall, `OpenConfig 1.0` recommends allowing `SCP` rather `SPD`, by accepting `json` based `ECM` through the `--openconfig.v1` CLI flag. 
-
-### Why Protocol Buffers?
-
-> Protocol buffers are Google's language-neutral, platform-neutral, extensible mechanism for serializing structured data – think XML, but smaller, faster, and simpler. You define how you want your data to be structured once, then you can use special generated source code to easily write and read your structured data to and from a variety of data streams and using a variety of languages.
-
-On top of incredibly efficient and fast serialization capabilities it also works well [Interface Definition Language](https://en.wikipedia.org/wiki/Interface_description_language) and it is the most used and widely adopted IDL in the industry. For example, protobuf is the definition language and serialization format for [gRPC](https://grpc.io/).
-
-Main reasons are that `proto` (version 3) language is **strongly typed, simple, consistent**, but also **backward and forward compatible**. In addition to it's stable and fast binary serialization format it be also easily decoded or encoded into human readable formats like YAML or JSON.
-
-Last, but the least there exists variety of encoders for almost every coding language. You can read more [here](https://developers.google.com/protocol-buffers/docs/cpptutorial).
-
-If that is not enough, `protobuf` ecosystem is [constantly evolving](https://twitter.com/bwplotka/status/1345076383190556676).
-
-#### Not in the scope
-
-* Runtime APIs, RPCs and Invocation semantics (e.g error codes, output, input).
-* Configuration or Invocation API that will accept (e.g dynamically or statically) for configuration in `OpenConfig` format.
-* Discoverability of `Configuration Proto Definitions` details.
-
-## Content
+## This Repository
 
 | Item   | What | Status |
 |--------|------|--------|
-| `proto/openconfig/v1/extensions.proto`  |  *OpenConfig Proto Extensions Format 1.0* | Beta |
-| `proto/examples`  |  Example *Configuration Proto Definitions (CPD)* | Beta |
-| golang |      | WIP |
-|        |      |     |
+| [`proto/openconfig/v1/extensions.proto`](proto/openconfig/v1/extensions.proto)  |  *OpenConfig Proto Extensions Format 1.0* | Alpha |
+| [`proto/examples/helloworld/v1/helloworld.proto`]( proto/examples/helloworld/v1/helloworld.proto) |  Example *Configuration Proto Definitions (CPD)* | Alpha |
+| [`golang/`](golang)  | Go module with (optional) *OpenConfig Proto Extensions Format 1.0* bindings | Alpha |
+| [`golang/protoc-gen-go-openconfig`](golang/protoc-gen-go-openconfig/README.md)  | Go module with (optional) protogen go plugin supporting *OpenConfig Proto Extensions Format 1.0* Go language  | Alpha |
+| [`golang/examples`](golang/examples/README.md) | Go module with (optional) protogen go plugin supporting *OpenConfig Proto Extensions Format 1.0* Go language  | Alpha |
 
-
-## Quick Start
-
-### Go
-
-#### Prerequisites
-
-* [Go](https://golang.org/)
-
-For installation instructions, see [Go’s Getting Started guide](https://golang.org/doc/install).
-
-* [Protocol buffer compiler](https://developers.google.com/protocol-buffers) (`protoc`), [version 3](https://developers.google.com/protocol-buffers/docs/proto3).
-
-For installation instructions, see [Protocol Buffer Compiler Installation](https://grpc.io/docs/protoc-installation/).
-
-* Go plugins for the protocol compiler:
-
-  1. Install the protocol compiler plugins for Go and OpenConfig using the following commands:
-
-  ```bash
-  export GO111MODULE=on  # Enable module mode
-  go get google.golang.org/protobuf/cmd/protoc-gen-go \
-    github.com/thanos-io/OpenConfig/protoc-gen-go-openconfig
-  ```
-
-  1. Update your PATH so that the protoc compiler can find the plugins:
-
-  ```bash
-  export PATH="$PATH:$(go env GOPATH)/bin
-  ```
-
-#### Run example
-
-1. Read the OpenConfig spec for helloworld project (from repo root): `examples/helloworld/helloworld.proto`
-2. This example has already generated Go code from this spec, you can read it: `golang/examples/helloworld/hellworld.pb.go` and `golang/examples/helloworld/hellworld_openconfig.pb.go`
-3. Change directory to the quick start example directory for Go `cd golang/examples/helloworld`
-4. Go example contains two binaries that are already importing and using generated code `./executor` and `./executable`
-5. Run `go run ./executable --help` and `go run ./executable hello --help` to see the example executable help output of the available configuration options. Now if you look on Go code for this (`./executable/main.go`) you will that most of the parsing code is actually generated from OpenConfig proto.
-6. Feel free to run executable with any parameters you want. Executable will execute all as spec and help specifies. For example you can run:
-
-```bash
-go run ./executable hello --world="my" --year=2021 --name="Kate B" --lang=ENGLISH --add-really
-```
-
-The above should print ``
-
-1. This is not everything. Spec and this Go binding allows to generate nice executor (Go client of executable). You can see executor using generated executor logic in `./executor/main.go`.
-2. Feel free to play with `./executor/main.go` and run it with `go run ./executor`. It will invoke the executable with chosen (typed!) parameters,
-
-#### Updating & Generating example OpenConfig Spec
-
-Let's now try to change the spec and re-generate Go code. This allows our Go executor and executable implementations to use it immediately
-
-1. Modify `examples/helloworld/helloworld.proto`. Let's remove X
-2. From the `go` directory run `make proto`.
-
-To see what it does you can check `golang/Makefile` `proto` target:
-
-```Makefile
-	@echo ">> generating $(REPO_ROOT_DIR)/examples/helloworld/helloworld.proto in $(REPO_ROOT_DIR)/golang/examples/helloworld/"
-	@PATH=$(GOBIN):$(TMP_GOBIN) $(PROTOC) -I $(REPO_ROOT_DIR)/examples/helloworld \
-		--go_out=./examples/helloworld/ --go_opt=paths=source_relative \
-	   	--go-openconfig_out=./examples/helloworld/ --go-openconfig_opt=paths=source_relative \
-	    $(REPO_ROOT_DIR)/examples/helloworld/helloworld.proto
-```
-
-This makefile snippet generates the code from proto to our `golang/example/helloworld` directory. It has to have `protoc`, `protoc-gen-go` and `protoc-gen-openconfig` binaries installed (I know that's bit a lot 💩 - complains should go to profobuf ecosystem)
-
-1. Once generated repeat same process with running executable and executor as previously.
-
-## Contributing
+### Contributing
 
 Any help wanted. Do you have idea, want to help, don't know how to start helping? 
 
@@ -185,23 +66,22 @@ Help wanted!
 * [ ] Documentation for using OpenConfig 1.0 by different language than supported by this repo.
 * [ ] Documentation for writing OpenConfig 1.0 plugin for different language than supported by this repo.  
 * [ ] Publish formal RFC-compatible specification
+* [ ] Document extensibility.
+* [ ] Large protobuf are really hard to use. Standard should specify some solution when `Encoded Configuration Message` is larger than Megabytes.
+* [ ] Unit tests.
 
 ## Initial Authors
 
 * Bartek Płotka @bwplotka
 * Frederic Branczyk @brancz
 
-## Open Questions:
+#### Open Questions:
 
-### Block protobuf bytes encoding completely? or actually make it mandatory?
+##### Block protobuf bytes encoding completely? or actually make it mandatory?
 
 This is tricky. From our experience configuration **has to be** human-readable, especially static one. However, there might be cases of configuration being large or maybe configuration process being latency critical. In those cases well compressible proto byte format shall be useful.
 
-### Large `ECM`
-
-Large protobuf are really hard to use. Standard should specify some solution when `Encoded Configuration Message` is larger than Megabytes.
-
-### Standard should specify discoverability?
+##### Standard should specify discoverability?
 
 Discoverability of the protobuf is a big problem in the ecosystem (e.g `gRPC`). Ideally binaries are self-describing. There might be huge value in bringing
 this topic here, but it could be also subject of another specification (as per `Focus on one thing well`).
@@ -213,9 +93,3 @@ For example:
 >  * For web applications it's recommended to also expose `/openconfig/v1` endpoint that returns `CPD`  `.proto` format.
 
 The above assumes `CPD` is self-contained which conflicts with below points about extensibility.
-This could then looks like: 
-
-<div class="bg-gray">
-<img src="https://docs.google.com/drawings/d/e/2PACX-1vSI4Z7dP3TfnoFFAohwCATtC_JOcc1TPgGgaPrkcs2SdNjLPfwMUAQa2D5DmlbG_sI_s7HqJzv4VrAM/pub?w=1440&h=1080"/>
-</div>
-

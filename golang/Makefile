@@ -1,8 +1,9 @@
 include ../common.mk
 include ../.bingo/Variables.mk
 
-MODULE_EXAMPLES := examples
-MODULE_GEN_GO     :=protoc-gen-go-openconfig
+MODULE_EXAMPLES   := examples
+MODULE_GEN_GO     := protoc-gen-go-openconfig
+MODULE_KINGPINV2  := kingpinv2
 
 FILES_TO_FMT      ?= $(shell find . -path ./vendor -prune -o -name '*.go' -print)
 TMP_GOBIN ?= $(TMP_PATH)/gobin
@@ -25,6 +26,7 @@ deps: ## Ensures fresh go.mod and go.sum.
 	@go mod tidy && go mod verify
 	@cd $(MODULE_EXAMPLES) && go mod tidy && go mod verify
 	@cd $(MODULE_GEN_GO) && go mod tidy && go mod verify
+	@cd $(MODULE_KINGPINV2) && go mod tidy && go mod verify
 
 .PHONY: format
 format: ## Formats Go code.
@@ -40,13 +42,14 @@ test:
 	@go mod tidy && go test -v -timeout=30m ./...
 	@cd $(MODULE_EXAMPLES) && go test -v -timeout=30m ./...
 	@cd $(MODULE_GEN_GO) && go test -v -timeout=30m ./...
+	@cd $(MODULE_KINGPINV2) && go test -v -timeout=30m ./...
 
 # For protoc naming matters.
 PROTOC_GEN_GO_CURRENT := $(TMP_GOBIN)/protoc-gen-go
 
 .PHONY: proto
 proto: ## Generated golang protobuf
-proto: build $(BUF) $(PROTOC_GEN_GO) $(PROTO_DESCRIPTOR_FILE)
+proto: build $(BUF) $(PROTOC_GEN_GO)
 	@mkdir -p $(TMP_GOBIN)
 	@cp $(PROTOC_GEN_GO) $(PROTOC_GEN_GO_CURRENT)
 	@echo ">> generating $(REPO_ROOT_DIR)/proto/openconfig/v1/extensions.proto in $(REPO_ROOT_DIR)/golang"
@@ -54,6 +57,11 @@ proto: build $(BUF) $(PROTOC_GEN_GO) $(PROTO_DESCRIPTOR_FILE)
 		-I $(REPO_ROOT_DIR)/proto \
 		--go_out=$(REPO_ROOT_DIR)/golang --go_opt=module="github.com/thanos-io/OpenConfig/golang" \
 	    $(REPO_ROOT_DIR)/proto/openconfig/v1/extensions.proto
+	@echo ">> generating $(REPO_ROOT_DIR)/proto/openconfig/golang/kingpinv2/v1/extensions.proto in $(REPO_ROOT_DIR)/golang/kingpinv2"
+	@PATH=$(GOBIN):$(TMP_GOBIN) $(BUF) protoc \
+		-I $(REPO_ROOT_DIR)/proto \
+		--go_out=$(REPO_ROOT_DIR)/golang/kingpinv2 --go_opt=module="github.com/thanos-io/OpenConfig/golang/kingpinv2" \
+		$(REPO_ROOT_DIR)/proto/openconfig/golang/kingpinv2/v1/extensions.proto
 	@echo ">> generating $(REPO_ROOT_DIR)/proto/examples/helloworld/v1/helloworld.proto in $(REPO_ROOT_DIR)/golang/examples/helloworld/"
 	@PATH=$(GOBIN):$(TMP_GOBIN) $(BUF) protoc \
 		-I $(REPO_ROOT_DIR)/proto \
@@ -75,6 +83,7 @@ lint: $(FAILLINT) $(GOLANGCI_LINT) $(MISSPELL) build format proto check-git deps
 	@DIR="." $(MAKE) lint_module
 	@DIR=$(MODULE_EXAMPLES) $(MAKE) lint_module
 	@DIR=$(MODULE_GEN_GO) $(MAKE) lint_module
+	@DIR=$(MODULE_KINGPINV2) $(MAKE) lint_module
 	@echo ">> detecting misspells"
 	@find . -type f | grep -v vendor/ | grep -vE '\./\..*' | xargs $(MISSPELL) -error
 	$(call require_clean_work_tree,"detected files change during formar/lint process - run make lint and commit changes.")
