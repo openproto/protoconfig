@@ -1,12 +1,40 @@
 # OpenConfig
 
-Open standard for generating, defining and using software configuration input.
+`OpenConfig 1.0` standard specifies a process of using, defining and consuming software configuration input in a way that is:
+
+* Configuration that is **Discoverable** and **Type Safe**
+
+We don't need to guess or read complex documentations in order to know application configuration format, invariants and assumptions
+
+> Configuration is defined by a single, typed [proto](https://developers.google.com/protocol-buffers) package.
+
+* **Auto Generation**
+  
+We don't need manually write application client and application CLI / Configuration definitions, or even documentation (!).
+All can be safely generated thanks to protobuf and plugin ecosystem
+
+> Similar to `client` and `server` generation in gRPC or OpenAPI 💪
+
+* **Easy to Verify**
+
+Non-semantic verification and validation (e.g ) does not require executable participation.
+
+> No need for CLI --dry-run logic, or even invoking anything external. All can be validated from the point of protobuf.
+
+* **Maintainable**
+  
+Smallest, possible impact in the event of application upgrade of modification. Type, Default or even Help changed can be tracked in
+any language.
+
+* **Backward & Forward Compatible** 
+  
+Smooth version migrations, thanks to protobuf guarantee and safety checkers like [`buf check breaking`](https://docs.buf.build/breaking-usage)
 
 ## Motivation
 
 See ["Configuration in 2021 is still broken"](https://deploy-preview-26--bwplotka.netlify.app/2020/configuring-sw-is-broken/)
 
-## Spec Tl;DR
+## Spec TL;DR
 
 ### Principles
 
@@ -47,8 +75,6 @@ Additionally:
 
 Overall, `OpenConfig 1.0` recommends allowing `SCP` rather `SPD`, by accepting `json` based `ECM` through the `--openconfig.v1` CLI flag. 
 
-Full standard will be published soon (help wanted if you want to contribute 🤗)
-
 ### Why Protocol Buffers?
 
 > Protocol buffers are Google's language-neutral, platform-neutral, extensible mechanism for serializing structured data – think XML, but smaller, faster, and simpler. You define how you want your data to be structured once, then you can use special generated source code to easily write and read your structured data to and from a variety of data streams and using a variety of languages.
@@ -60,16 +86,6 @@ Main reasons are that `proto` (version 3) language is **strongly typed, simple, 
 Last, but the least there exists variety of encoders for almost every coding language. You can read more [here](https://developers.google.com/protocol-buffers/docs/cpptutorial).
 
 If that is not enough, `protobuf` ecosystem is [constantly evolving](https://twitter.com/bwplotka/status/1345076383190556676).
-
-### Scope
-
-`OpenConfig 1.0` standard specifies a process of configuring, define configuration and consume configuration by software applications in a way that is: 
-
-* Discoverable and Type Safe: **We don't need to guess or read complex documentations in order to know executable configuration format, invariants and assumptions**
-* Auto Generatable: **We don't need manually write application client and executable config definitions**
-* Easy to Verify: **Non-semantic verification and validation (e.g ) does not require executable participation**
-* Maintainable: **Smallest possible impact in the event of executable upgrade of modification**
-* Backward & Forward Compatible: **Smooth version migrations**
 
 #### Not in the scope
 
@@ -161,6 +177,14 @@ This makefile snippet generates the code from proto to our `golang/example/hello
 Any help wanted. Do you have idea, want to help, don't know how to start helping? 
 
 Put an issue on this repo, create PR or ping us on the CNCF Slack (`@bwplotka`, `@brancz`)! 🤗
+
+### Roadmap
+
+Help wanted!
+
+* [ ] Documentation for using OpenConfig 1.0 by different language than supported by this repo.
+* [ ] Documentation for writing OpenConfig 1.0 plugin for different language than supported by this repo.  
+* [ ] Publish formal RFC-compatible specification
 
 ## Initial Authors
 
