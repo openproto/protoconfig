@@ -7,16 +7,22 @@ GO     ?= $(shell which go)
 
 # Bellow generated variables ensure that every time a tool under each variable is invoked, the correct version
 # will be used; reinstalling only if needed.
-# For example for faillint variable:
+# For example for buf variable:
 #
 # In your main Makefile (for non array binaries):
 #
 #include .bingo/Variables.mk # Assuming -dir was set to .bingo .
 #
-#command: $(FAILLINT)
-#	@echo "Running faillint"
-#	@$(FAILLINT) <flags/args..>
+#command: $(BUF)
+#	@echo "Running buf"
+#	@$(BUF) <flags/args..>
 #
+BUF := $(GOBIN)/buf-v0.33.0
+$(BUF): $(BINGO_DIR)/buf.mod
+	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
+	@echo "(re)installing $(GOBIN)/buf-v0.33.0"
+	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=buf.mod -o=$(GOBIN)/buf-v0.33.0 "github.com/bufbuild/buf/cmd/buf"
+
 FAILLINT := $(GOBIN)/faillint-v1.5.0
 $(FAILLINT): $(BINGO_DIR)/faillint.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
