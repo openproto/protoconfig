@@ -1,3 +1,7 @@
+# OpenConfig 1.0
+
+[![golang docs](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/thanos-io/OpenConfig/golang) [![Latest Release](https://img.shields.io/github/release/thanos-io/OpenConfig.svg?style=flat-square)](https://github.com/thanos-io/OpenConfig/releases/latest)
+
 The `OpenConfig 1.0` is a specification that describes a process of using, defining, and consuming software configuration input in a unified way.
 
 *Like gRPC or OpenAPI but for Application (static or dynamic) Configuration.*
@@ -65,8 +69,9 @@ Help wanted!
 
 * [ ] Documentation for using OpenConfig 1.0 by different language than supported by this repo.
 * [ ] Documentation for writing OpenConfig 1.0 plugin for a different language than supported by this repo.
-* [ ] Publish formal RFC-compatible specification
+* [ ] Publish formal RFC-compatible specification, finish it, add recommendations (e.g package names).
 * [ ] Document extensibility.
+* [ ] Add example if any configuration templating engine.
 * [ ] Large `protobuf` are hard to use. Standard should specify some solution when `Encoded Configuration Message` is larger than Megabytes.
 * [ ] Unit tests.
 

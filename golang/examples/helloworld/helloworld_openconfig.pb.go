@@ -3,42 +3,53 @@
 package helloworldpb
 
 import (
+	bytes "bytes"
 	fmt "fmt"
 	golang "github.com/thanos-io/OpenConfig/golang"
 	protojson "google.golang.org/protobuf/encoding/protojson"
 	proto "google.golang.org/protobuf/proto"
-	exec "os/exec"
 )
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the OpenConfig golang package it is being compiled against.
 const _ = golang.SupportPackageIsVersion1
 
-func NewHelloCommand(x *HelloCommand) *HelloWorld_Hello {
-	return &HelloWorld_Hello{Hello: x}
+func NewHelloCommand(x *HelloCommand) *HelloWorldConfiguration_Hello {
+	return &HelloWorldConfiguration_Hello{Hello: x}
 }
 
-func NewByeCommand(x *ByeCommand) *HelloWorld_Bye {
-	return &HelloWorld_Bye{Bye: x}
+func NewByeCommand(x *ByeCommand) *HelloWorldConfiguration_Bye {
+	return &HelloWorldConfiguration_Bye{Bye: x}
 }
 
-func NewByeWorldCommand(x *ByeWorldCommand) *ByeCommand_World {
-	return &ByeCommand_World{World: x}
-}
-
-func NewByeConfigurableCommand(x *ByeConfigurableCommand) *ByeCommand_Just {
+func NewByeJustCommand(x *ByeJustCommand) *ByeCommand_Just {
 	return &ByeCommand_Just{Just: x}
 }
 
-func (x *HelloWorld) Marshal() ([]byte, error) {
+func NewByeConfigurableCommand(x *ByeConfigurableCommand) *ByeCommand_Configurable {
+	return &ByeCommand_Configurable{Configurable: x}
+}
+
+// Encode encodes self as `Encoded Configuration Message` in proto format so it can be understood and
+// passed to Configurable struct. It supports all `OpenConfig Proto Extensions Format 1.0` extenstion
+// (validation, default values etc).
+// Use `proto.Marshal` encoding without `OpenConfig 1.0` extension support.
+func (x *HelloWorldConfiguration) Encode() ([]byte, error) {
+	// TODO(bwplotka): Actually implement validation for `OpenConfig Proto Extensions Format 1.0` (:
 	return proto.Marshal(x)
 }
 
-func (x *HelloWorld) MarshalJSON() ([]byte, error) {
+// EncodeJSON encodes self as `Encoded Configuration Message` in JSON format so it can be understood and
+// passed to Configurable struct. It supports all `OpenConfig Proto Extensions Format 1.0` extenstion
+// (validation, default values etc).
+// Use `protojson.Marshal` encoding without `OpenConfig 1.0` extension support.
+func (x *HelloWorldConfiguration) EncodeJSON() ([]byte, error) {
+	// TODO(bwplotka): Actually implement validation for `OpenConfig Proto Extensions Format 1.0` (:
 	return protojson.Marshal(x)
 }
 
-func (x *HelloWorld) Metadata() golang.Metadata {
+// Metadata returns metadata defined in `OpenConfig Proto Extensions Format 1.0`.
+func (x *HelloWorldConfiguration) Metadata() golang.Metadata {
 	return golang.Metadata{
 		Name:              "configurable",
 		Version:           "0.1.0",
@@ -47,32 +58,46 @@ func (x *HelloWorld) Metadata() golang.Metadata {
 	}
 }
 
-func (x *HelloWorld) NewExecCmd(name string) (*exec.Cmd, error) {
-	b, err := x.Marshal()
+func (x *HelloWorldConfiguration) CommandLineArgument() (string, error) {
+	b, err := x.Encode()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return exec.Command(name, fmt.Sprintf("--openconfigv1=%s", b)), nil
+	return fmt.Sprintf("--openconfigv1=%s", b), nil
 }
 
-// This is a compile-time assertion to ensure that extendedHelloWorldimplements
-// golang.Commander interface.
-var _ golang.Commander = &HelloWorld{}
-
-// This is a compile-time assertion to ensure that extended HelloWorld implements
+// This is a compile-time assertion to ensure that extended HelloWorldConfiguration implements
 // golang.Configurator interface.
-var _ golang.Configurator = &HelloWorld{}
+var _ golang.Configurator = &HelloWorldConfiguration{}
 
-func (x *HelloWorld) Unmarshal(b []byte) error {
-	// TODO(bwplotka): Generate code that checks first bytes and guess format from it.
-	return proto.Unmarshal(b, x)
+// Decode parses byte slice as `Encoded Configuration Message` in JSON or proto format and unmarshal it on
+// the Configurable struct. It supports all `OpenConfig Proto Extensions Format 1.0` extenstion
+// (validation, default values etc).
+// Use `proto.Unmarshal` or `protojson.Unmarshal` for decoding without `OpenConfig 1.0` extension support.
+func (x *HelloWorldConfiguration) Decode(ecm []byte) error {
+	// TODO(bwplotka): Actually implement validation for `OpenConfig Proto Extensions Format 1.0` (:
+	if isJSON(ecm) {
+		return protojson.Unmarshal(ecm, x)
+	}
+	return proto.Unmarshal(ecm, x)
 }
 
-func (x *HelloWorld) UnmarshalString(b string) error {
-	// TODO(bwplotka): Generate code that checks first bytes and guess format from it.
-	return proto.Unmarshal([]byte(b), x)
+// DecodeString parses string as `Encoded Configuration Message` in JSON or proto format and unmarshal it on
+// the Configurable struct. It supports all `OpenConfig Proto Extensions Format 1.0` extenstion
+// (validation, default values etc).
+// Use `proto.Unmarshal` or `protojson.Unmarshal` for decoding without `OpenConfig 1.0` extension support.
+func (x *HelloWorldConfiguration) DecodeString(ecm string) error {
+	return x.Decode([]byte(ecm))
 }
 
-// This is a compile-time assertion to ensure that extended HelloWorld implements
+func isJSON(b []byte) bool {
+	bb := bytes.TrimSpace(b)
+	if len(bb) == 0 {
+		return false
+	}
+	return bb[0] == '{'
+}
+
+// This is a compile-time assertion to ensure that extended HelloWorldConfiguration implements
 // golang.Configurable interface.
-var _ golang.Configurable = &HelloWorld{}
+var _ golang.Configurable = &HelloWorldConfiguration{}

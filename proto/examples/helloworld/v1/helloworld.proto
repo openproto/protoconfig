@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "openconfig/v1/extensions.proto";
+import "openconfig/golang/kingpinv2/v1/extensions.proto";
 
 option go_package = "github.com/thanos-io/OpenConfig/golang/examples/helloworld;helloworldpb";
 option java_multiple_files = true;
@@ -9,7 +10,7 @@ option java_outer_classname = "HelloWorldProto";
 
 package examples.helloworld.v1;
 
-message HelloWorld {
+message HelloWorldConfiguration {
     option (openconfig.v1.metadata) = {
         name: "configurable"
         version: "0.1.0"
@@ -32,6 +33,8 @@ enum Lang {
 }
 
 message HelloCommand {
+    option (openconfig.golang.kingpinv2.v1.command) = {name :"hello" };
+
     string name = 1 [(openconfig.v1.required) = true];
     int64 year = 2 [(openconfig.v1.default) = "2021"];
     string world = 3;
@@ -42,23 +45,29 @@ message HelloCommand {
 }
 
 message ByeCommand {
+    option (openconfig.golang.kingpinv2.v1.command) = {name :"bye" };
+
     Lang lang = 1;
     oneof command {
-        ByeWorldCommand world = 2;
-        ByeConfigurableCommand just = 3;
+        ByeJustCommand just = 2;
+        ByeConfigurableCommand configurable = 3;
     }
 }
 
-message ByeWorldCommand {}
+message ByeJustCommand {
+    option (openconfig.golang.kingpinv2.v1.command) = {name :"just" };
+}
 
 message ByeConfigurableCommand {
-    string arg = 2;
-    ByeConfiguration config = 1;
+    option (openconfig.golang.kingpinv2.v1.command) = {name :"configurable" };
+
+    string config_id = 1;
+    ByeConfiguration config = 2;
+    repeated string extra = 3;
 }
 
 message ByeResponse {
-    string response = 1;
-    bool capitalized = 2;
+    bool capitalized = 1;
 }
 
 message ByeConfiguration {

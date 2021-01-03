@@ -18,3 +18,6 @@ lint: $(BUF) docs
 	@$(MAKE) -C golang lint
 	$(call require_clean_work_tree,"detected changed files - run make lint and commit changes.")
 
+.PHONY: proto
+proto:
+	@$(MAKE) -C ./golang proto

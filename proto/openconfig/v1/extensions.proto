@@ -17,12 +17,21 @@ option go_package = "github.com/thanos-io/OpenConfig/golang;openconfig";
 
 import "google/protobuf/descriptor.proto";
 
-// TODO(bwplotka): Make it non pointers (in Go).
+/// Metadata is an Message option that when put on message indicates an entry point for certain configuration.
+/// One `Configuration Proto Definition` can have many structs marked as this option.
+/// TODO(bwplotka): Make it non pointers (in Go).
 message Metadata {
+    /// name represents name of annotated configuration entry point.
+    /// It's recommended to use executable name here.
     string name = 1;
+    /// version is the semantic version of the annotated configuration.
     string version = 2;
     string description = 3;
 
+    /// delivery_mechanism optionally specifies the delivery that is implemented by configurable that consumes this
+    /// configuration. This allows `Configurator` to discover how to pass the `Encoded Configuration Message`
+    /// without extra information outside of definition.
+    // TODO(bwplotka): This might be blocking reusability. Rethink?
     oneof delivery_mechanism {
         StdinDelivery stdin_delivery = 101;
         FlagDelivery flag_delivery = 102;
@@ -32,16 +41,26 @@ message Metadata {
 message StdinDelivery {}
 
 message FlagDelivery {
+    /// name represents custom flag name (including `-` if any) for a flag that consumes bytes of `Encoded Configuration Message`
+    // OpenConfig 1.0 recommends `--openconfigv1` name.
     string name = 1;
 }
 
 extend google.protobuf.MessageOptions {
+    /// metadata represents
     Metadata metadata = 5000;
 }
 
 extend google.protobuf.FieldOptions {
+    /// default represents an option that sets a default value for the field.
     string default = 5000;
+    /// hidden represents an option that marks a field as hidden. What it actually causes is up to the Configurable.
+    /// OpenConfig 1.0 recommends hiding it from the documentation.
     bool hidden   = 5001;
+    /// required represents an option that marks a field as mandatory and if empty, Configurable does not accept the whole configuration.
     bool required = 5002;
+    /// experimental represents an option that marks a field as experimental. What it actually causes is up to the Configurable.
+    /// OpenConfig 1.0 recommends warning in the documentation.
+    bool experimental = 5003;
 
 }
