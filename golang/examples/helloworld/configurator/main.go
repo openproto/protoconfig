@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"bytes"
 	"log"
+	"os"
 	"os/exec"
 
 	openconfig "github.com/thanos-io/OpenConfig/golang"
@@ -11,83 +12,48 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// Command invoking go run ./configurable hello --world="my" --year=2021 --name="Kate B" --lang=ENGLISH --add-really
+func runCmdAndPrintResult(dir string, args ...string) {
+	c := exec.Command(args[0], args[1:]...)
+	c.Dir = dir
+	b := bytes.Buffer{}
+	c.Stdout = &b
+	c.Stderr = &b
+	if err := c.Run(); err != nil {
+		log.Fatal(err, b.String())
+	}
+	log.Printf("[%v] => %s\n", args, b.String())
+}
+
+// Command invoking go run ./configurable-kingpinv2 hello --world="my" --year=2077 --name="Alt C" --lang=ENGLISH --add-really
 // using a few different methods.
 func main() {
-	runUsingArgs()
-	runUsingOpenConfig1_0()
-	runUsingOpenConfig1_0_NoPlugin()
+	log.SetFlags(0)
+	pwd, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	runUsingArgs(pwd)
+	runUsingOpenConfig1_0_NoPlugin(pwd)
+	runUsingOpenConfig1_0(pwd)
 }
 
-func runUsingArgs() {
-	log.Print("invoking configurable using args:")
+func runUsingArgs(dir string) {
+	log.Println("invoking configurable using args:")
 
-	// Prone to errors, not generated, not maintainable, not safely typed.
-	res, err := exec.Command("go run ../configurable", "hello", "--world=my", "--year=2021", "--name=Kate B", "--lang=1", "--add-really").Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("%q\n", string(res))
+	// Prone to errors, not generated, not maintainable, not safely typed, etc..
+	runCmdAndPrintResult(dir, "go", "run", "./configurable-kingpinv2", "hello", "--world=my", "--year=2077", "--name=Alt C", "--lang=ENGLISH", "--add-really")
 }
 
-func runUsingOpenConfig1_0() {
-	c := &helloworldpb.HelloWorld{
-		Command: helloworldpb.NewHelloCommand(&helloworldpb.HelloCommand{
-			World:     "my",
-			Year:      2021,
-			Name:      "Kate B",
-			Lang:      helloworldpb.Lang_ENGLISH,
-			AddReally: true,
-		}),
-	}
+func runUsingOpenConfig1_0_NoPlugin(dir string) {
+	log.Println("invoking configurable using OpenConfig 1.0 (with just using native protogen-go nothing else!):")
 
-	log.Print("invoking configurable using OpenConfig 1.0 (MarshalJSON):")
-	b, err := c.MarshalJSON()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	res, err := exec.Command(fmt.Sprintf("go run ../%s", c.Metadata().Name), fmt.Sprintf("--openconfigv1=%s", b)).Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("%q\n", string(res))
-	log.Print("invoking configurable using OpenConfig 1.0 (Marshal):")
-
-	b, err = c.Marshal()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	res, err = exec.Command(fmt.Sprintf("go run ../%s", c.Metadata().Name), fmt.Sprintf("--openconfigv1=%s", b)).Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("%q\n", string(res))
-	log.Print("invoking configurable using OpenConfig 1.0 (NewExecCommand()):")
-
-	cmd, err := c.NewExecCmd(fmt.Sprintf("go run ../%s", c.Metadata().Name))
-	if err != nil {
-		log.Fatal(err)
-	}
-	res, err = cmd.Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Printf("%q\n", string(res))
-	log.Printf("%q\n", string(res))
-}
-
-func runUsingOpenConfig1_0_NoPlugin() {
-	log.Print("invoking configurable using OpenConfig 1.0 (with just using native protogen-go nothing else):")
-
-	c := &helloworldpb.HelloWorld{
-		Command: &helloworldpb.HelloWorld_Hello{
+	c := &helloworldpb.HelloWorldConfiguration{
+		Command: &helloworldpb.HelloWorldConfiguration_Hello{
 			Hello: &helloworldpb.HelloCommand{
 				World:     "my",
-				Year:      2021,
-				Name:      "Kate B",
+				Year:      2077,
+				Name:      "Alt C",
 				Lang:      helloworldpb.Lang_ENGLISH,
 				AddReally: true,
 			},
@@ -102,9 +68,47 @@ func runUsingOpenConfig1_0_NoPlugin() {
 		log.Fatal(err)
 	}
 
-	res, err := exec.Command(fmt.Sprintf("go run ../%s", appName), fmt.Sprintf("--openconfigv1=%s", b)).Output()
+	runCmdAndPrintResult(dir, "go", "run", "./"+appName, "--openconfigv1="+string(b))
+	runCmdAndPrintResult(dir, "go", "run", "./"+appName+"-kingpinv2", "--openconfigv1="+string(b))
+}
+
+func runUsingOpenConfig1_0(dir string) {
+	c := &helloworldpb.HelloWorldConfiguration{
+		Command: helloworldpb.NewHelloCommand(&helloworldpb.HelloCommand{
+			World:     "my",
+			Year:      2077,
+			Name:      "Alt C",
+			Lang:      helloworldpb.Lang_ENGLISH,
+			AddReally: true,
+		}),
+	}
+
+	log.Println("invoking configurable using OpenConfig 1.0 (EncodeJSON):")
+	b, err := c.EncodeJSON()
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("%q\n", string(res))
+
+	runCmdAndPrintResult(dir, "go", "run", "./"+c.Metadata().Name, "--openconfigv1="+string(b))
+	runCmdAndPrintResult(dir, "go", "run", "./"+c.Metadata().Name+"-kingpinv2", "--openconfigv1="+string(b))
+
+	log.Println("invoking configurable using OpenConfig 1.0 (Marshal):")
+
+	b, err = c.Encode()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	runCmdAndPrintResult(dir, "go", "run", "./"+c.Metadata().Name, "--openconfigv1="+string(b))
+	runCmdAndPrintResult(dir, "go", "run", "./"+c.Metadata().Name+"-kingpinv2", "--openconfigv1="+string(b))
+
+	log.Println("invoking configurable using OpenConfig 1.0 (CommandLineArgument()):")
+
+	arg, err := c.CommandLineArgument()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	runCmdAndPrintResult(dir, "go", "run", "./"+c.Metadata().Name, arg)
+	runCmdAndPrintResult(dir, "go", "run", "./"+c.Metadata().Name+"-kingpinv2", arg)
 }

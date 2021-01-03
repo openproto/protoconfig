@@ -11,7 +11,7 @@ import (
 const (
 	bytesPackage      = protogen.GoImportPath("bytes")
 	fmtPackage        = protogen.GoImportPath("fmt")
-	osExecPackage     = protogen.GoImportPath("os/exec")
+	ioPackage         = protogen.GoImportPath("io")
 	protoPackage      = protogen.GoImportPath("google.golang.org/protobuf/proto")
 	protojsonPackage  = protogen.GoImportPath("google.golang.org/protobuf/encoding/protojson")
 	openConfigPackage = protogen.GoImportPath("github.com/thanos-io/OpenConfig/golang")
@@ -92,19 +92,26 @@ func generateOneOfHelper(g *protogen.GeneratedFile, root *protogen.Message, dup 
 	}
 }
 func generateConfiguratorSide(g *protogen.GeneratedFile, c *openconfig.Metadata, root *protogen.Message) {
-	// Generate helpers.
-	// User can already use protobuf structs to fill in and generate JSON and protobuf without this plugin.
-	// The true value will be for configuration languages like Jsonnet, Cue, etc.
-
-	// TODO(bwplotka): Is this really needed?
-	g.P("func (x *", root.GoIdent.GoName, ") Marshal() ([]byte, error) {")
+	g.P("// Encode encodes self as `Encoded Configuration Message` in proto format so it can be understood and")
+	g.P("// passed to Configurable struct. It supports all `OpenConfig Proto Extensions Format 1.0` extenstion")
+	g.P("// (validation, default values etc).")
+	g.P("// Use `proto.Marshal` encoding without `OpenConfig 1.0` extension support.")
+	g.P("func (x *", root.GoIdent.GoName, ") Encode() ([]byte, error) {")
+	g.P("// TODO(bwplotka): Actually implement validation for `OpenConfig Proto Extensions Format 1.0` (: ")
 	g.P("return ", protoPackage.Ident("Marshal"), "(x)")
 	g.P("}")
 	g.P()
-	g.P("func (x *", root.GoIdent.GoName, ") MarshalJSON() ([]byte, error) {")
+	// TODO(bwplotka): Ideally get this from interface comment directly? (parse interface code?)
+	g.P("// EncodeJSON encodes self as `Encoded Configuration Message` in JSON format so it can be understood and")
+	g.P("// passed to Configurable struct. It supports all `OpenConfig Proto Extensions Format 1.0` extenstion")
+	g.P("// (validation, default values etc).")
+	g.P("// Use `protojson.Marshal` encoding without `OpenConfig 1.0` extension support.")
+	g.P("func (x *", root.GoIdent.GoName, ") EncodeJSON() ([]byte, error) {")
+	g.P("// TODO(bwplotka): Actually implement validation for `OpenConfig Proto Extensions Format 1.0` (: ")
 	g.P("return ", protojsonPackage.Ident("Marshal"), "(x)")
 	g.P("}")
 	g.P()
+	g.P("// Metadata returns metadata defined in `OpenConfig Proto Extensions Format 1.0`.")
 	g.P("func (x *", root.GoIdent.GoName, ") Metadata() ", openConfigPackage.Ident("Metadata"), " {")
 	// TODO(bwplotka): Generate, but not manually, find better way.
 	g.P("return ", openConfigPackage.Ident("Metadata"), "{")
@@ -123,32 +130,22 @@ func generateConfiguratorSide(g *protogen.GeneratedFile, c *openconfig.Metadata,
 
 	switch {
 	case c.GetFlagDelivery() != nil:
-		g.P("func (x *", root.GoIdent.GoName, ") NewExecCmd(name string) (*", osExecPackage.Ident("Cmd"), ", error) {")
-		g.P("b, err := x.Marshal()")
+		g.P("func (x *", root.GoIdent.GoName, ") CommandLineArgument() (string, error) {")
+		g.P("b, err := x.Encode()")
 		g.P("if err != nil {")
-		g.P("return nil, err")
+		g.P(`return "", err`)
 		g.P("}")
-		g.P(`return `, osExecPackage.Ident("Command"), `(name, `, fmtPackage.Ident("Sprintf"), `("`, c.GetFlagDelivery().Name, `=%s", b)), nil`)
+		g.P(`return `, fmtPackage.Ident("Sprintf"), `("`, c.GetFlagDelivery().Name, `=%s", b), nil`)
 		g.P("}")
-		g.P()
-		g.P("// This is a compile-time assertion to ensure that extended", root.GoIdent, "implements")
-		g.P("// ", openConfigPackage.Ident("Commander"), " interface.")
-		g.P("var _ ", openConfigPackage.Ident("Commander"), " = &", root.GoIdent.GoName, "{}")
 		g.P()
 	case c.GetStdinDelivery() != nil:
-		g.P("func (x *", root.GoIdent.GoName, ") NewExecCmd(name string) (*", osExecPackage.Ident("Cmd"), ", error) {")
-		g.P("b, err := x.Marshal()")
+		g.P("func (x *", root.GoIdent.GoName, ") CommandLineInput() (*", ioPackage.Ident("Reader"), ", error) {")
+		g.P("b, err := x.Encode()")
 		g.P("if err != nil {")
 		g.P("return nil, err")
 		g.P("}")
-		g.P("c := ", osExecPackage.Ident("Command"), "(name)")
-		g.P("c.Stdin = ", bytesPackage.Ident("NewReader"), "(b)")
-		g.P("return c, nil")
+		g.P("return ", bytesPackage.Ident("NewReader"), "(b), nil")
 		g.P("}")
-		g.P()
-		g.P("// This is a compile-time assertion to ensure that extended ", root.GoIdent, " implements")
-		g.P("// ", openConfigPackage.Ident("Commander"), " interface.")
-		g.P("var _ ", openConfigPackage.Ident("Commander"), " = &", root.GoIdent.GoName, "{}")
 		g.P()
 	}
 
@@ -164,20 +161,31 @@ func generateConfiguratorSide(g *protogen.GeneratedFile, c *openconfig.Metadata,
 //
 // Such app will be compatible with defined configuration and will output such filled typed after parsing.
 func generateConfigurableSide(g *protogen.GeneratedFile, _ *openconfig.Metadata, root *protogen.Message) {
-
-	// TODO(bwplotka): Is this really needed?
-	g.P("func (x *", root.GoIdent.GoName, ") Unmarshal(b []byte) error {")
-	g.P("// TODO(bwplotka): Generate code that checks first bytes and guess format from it.")
-	g.P("return ", protoPackage.Ident("Unmarshal"), "(b, x)")
+	g.P("// Decode parses byte slice as `Encoded Configuration Message` in JSON or proto format and unmarshal it on")
+	g.P("// the Configurable struct. It supports all `OpenConfig Proto Extensions Format 1.0` extenstion")
+	g.P("// (validation, default values etc).")
+	g.P("// Use `proto.Unmarshal` or `protojson.Unmarshal` for decoding without `OpenConfig 1.0` extension support.")
+	g.P("func (x *", root.GoIdent.GoName, ") Decode(ecm []byte) error {")
+	g.P("// TODO(bwplotka): Actually implement validation for `OpenConfig Proto Extensions Format 1.0` (: ")
+	g.P("if isJSON(ecm) { return ", protojsonPackage.Ident("Unmarshal"), "(ecm, x) }")
+	g.P("return ", protoPackage.Ident("Unmarshal"), "(ecm, x)")
 	g.P("}")
 	g.P()
-
-	g.P("func (x *", root.GoIdent.GoName, ") UnmarshalString(b string) error {")
-	g.P("// TODO(bwplotka): Generate code that checks first bytes and guess format from it.")
-	g.P("return ", protoPackage.Ident("Unmarshal"), "([]byte(b), x)")
+	g.P("// DecodeString parses string as `Encoded Configuration Message` in JSON or proto format and unmarshal it on")
+	g.P("// the Configurable struct. It supports all `OpenConfig Proto Extensions Format 1.0` extenstion")
+	g.P("// (validation, default values etc).")
+	g.P("// Use `proto.Unmarshal` or `protojson.Unmarshal` for decoding without `OpenConfig 1.0` extension support.")
+	g.P("func (x *", root.GoIdent.GoName, ") DecodeString(ecm string) error {")
+	g.P("return x.Decode([]byte(ecm))")
 	g.P("}")
 	g.P()
-
+	g.P("func isJSON(b []byte) bool {")
+	g.P("bb := ", bytesPackage.Ident("TrimSpace"), "(b)")
+	g.P("if len(bb) == 0 { return false }")
+	// TODO(bwplotka): Yolo. Improve.
+	g.P("return bb[0] == '{'")
+	g.P("}")
+	g.P()
 	g.P("// This is a compile-time assertion to ensure that extended ", root.GoIdent, " implements")
 	g.P("// ", openConfigPackage.Ident("Configurable"), " interface.")
 	g.P("var _ ", openConfigPackage.Ident("Configurable"), " = &", root.GoIdent.GoName, "{}")

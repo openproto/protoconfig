@@ -17,7 +17,7 @@ For installation instructions, see [Protocol Buffer Compiler Installation](https
   ```bash
   export GO111MODULE=on  # Enable module mode
   go get google.golang.org/protobuf/cmd/protoc-gen-go \
-    github.com/thanos-io/OpenConfig/protoc-gen-go-openconfig
+    github.com/thanos-io/OpenConfig/golang/protoc-gen-go-openconfig
   ```
 
     1. Update your PATH so that the protoc compiler can find the plugins:
@@ -26,41 +26,51 @@ For installation instructions, see [Protocol Buffer Compiler Installation](https
   export PATH="$PATH:$(go env GOPATH)/bin
   ```
 
-#### Run Example
+### Steps
 
-1. Read the OpenConfig spec for `examples/helloworld` project (from repo root): `examples/helloworld/helloworld.proto`
-2. This example has already generated Go code from this spec, you can read it: `golang/examples/helloworld/hellworld.pb.go` and `golang/examples/helloworld/hellworld_openconfig.pb.go`
-3. Change directory to the quick start example directory for Go `cd golang/examples/helloworld`
-4. Go example contains two binaries that are already importing and using generated code `./executor` and `./executable`
-5. Run `go run ./executable --help` and `go run ./executable hello --help` to see the example executable help output of the available configuration options. Now if you look on Go code for this (`./executable/main.go`) you will that most of the parsing code is actually generated from OpenConfig proto.
-6. Feel free to run executable with any parameters you want. Executable will execute all as spec and help specifies. For example you can run:
+1. Start by reading example application `Configuration Proto Definition` complainant with `OpenConfig 1.0` (from repo root):  [`proto/examples/helloworld/v1/helloworld.proto`](/proto/examples/helloworld/v1/helloworld.proto)
+
+This file is just `.proto` with a couple of options from few extensions:
+
+* `openconfig` defined in [`proto/openconfig/v1/extensions.proto`](/proto/openconfig/v1/extensions.proto) is an `OpenConfig 1.0` extension which adds optional context for given data fields like: `required` `hidden` `default` and allows to add metadata that indicates the entry point(s) for the configuration. 
+* `kingpin` defined in [`proto/golang/kingpinv2/v1/extensions.proto`](/proto/golang/kingpinv2/v1/extensions.proto) which adds `Go`, `kingpin` specific options allowing even more Go or [`kingpin`](https://github.com/alecthomas/kingpin) library specific context like custom types (existing file, regexp, IP) etc!
+
+The power of `OpenConfig 1.0` comes from `protobuf` superpowers: Those options are fully ignored if your `protoc` does not have plugins supporting them (for example you generate data structures for C++ or Java!). This allows ultimate extensibility.
+
+2. This example has already generated Go code from this `helloworld` application `Configuration Proto Definition`, and you can see it [golang/examples/helloworld/helloworld.pb.go](/golang/examples/helloworld/helloworld.pb.go) and [golang/examples/helloworld/helloworld_openconfig.pb.go](/golang/examples/helloworld/helloworld_openconfig.pb.go). Since it's generated code,
+   it's not readable much. Check [go.dev](https://pkg.go.dev/github.com/thanos-io/OpenConfig/golang/examples) instead! (It's go code after all and supports `godoc`!)
+   
+What you see is the `protobuf` Go code that allows to marshal and unmarshal filled types in to `OpenConfig 1.0` (and proto) compliant encoding.
+   
+3. Change directory to our quick start example directory for Go `cd golang/examples/helloworld`
+   
+4. In this directory, on top of generated Go code for `helloworld` `Configuration Proto Definition` we see a couple of directories:
+
+* `./configurable` is an `OpenConfig 1.0` compliant `helloword` application that just allows `OpenConfig` for configuration. 
+* `./configurable-kingpinv2` is an `OpenConfig 1.0` compliant `helloword` application that allows `OpenConfig` as well as standard POSIX flags (that were manually implemented based on [`kingpin`](https://github.com/alecthomas/kingpin) library ) for configuration.
+* `./configurable-kingpinv2-gen` is an `OpenConfig 1.0` compliant `helloword` application that allows `OpenConfig` as well as standard POSIX flags that were generated thanks to [`../kingpinv2/`](/golang/kingpinv2) extension.
+* `./configurator` is `helloworld` application client that configures (by executing it in another process) in couple different ways in order
+to get `(really!) Hello my world for "Alt C" in 2077 year!` string output.
+
+5. Feel free to run `./configurable-kingpinv2` with any parameters you want. Check all flags via `go run ./configurable-kingpinv2 --help` Executable will execute all as `Configuration Proto Definition` defines and help specifies. For example you can run:
 
 ```bash
-go run ./executable hello --world="my" --year=2021 --name="Kate B" --lang=ENGLISH --add-really
+go run ./configurable-kingpinv2 hello --world="my" --year=2077 --name="Alt C" --lang=ENGLISH --add-really
 ```
 
-The above should print ``
+But you can also use `OpenConfig 1.0` convention!:
 
-1. This is not everything. Spec and this Go binding allows to generate nice executor (Go client of executable). You can see executor using generated executor logic in `./executor/main.go`.
-2. Feel free to play with `./executor/main.go` and run it with `go run ./executor`. It will invoke the executable with chosen (typed!) parameters,
-
-#### Updating & Generating example OpenConfig Spec
-
-Let's now try to change the spec and re-generate Go code. This allows our Go executor and executable implementations to use it immediately
-
-1. Modify `examples/helloworld/helloworld.proto`. Let's remove X
-2. From the `go` directory run `make proto`.
-
-To see what it does you can check `golang/Makefile` `proto` target:
-
-```Makefile
-	@echo ">> generating $(REPO_ROOT_DIR)/examples/helloworld/helloworld.proto in $(REPO_ROOT_DIR)/golang/examples/helloworld/"
-	@PATH=$(GOBIN):$(TMP_GOBIN) $(PROTOC) -I $(REPO_ROOT_DIR)/examples/helloworld \
-		--go_out=./examples/helloworld/ --go_opt=paths=source_relative \
-	   	--go-openconfig_out=./examples/helloworld/ --go-openconfig_opt=paths=source_relative \
-	    $(REPO_ROOT_DIR)/examples/helloworld/helloworld.proto
+```bash
+go run ./configurable-kingpinv2 --openconfigv1='{"hello": {"name": "Alt C", "year": 2077, "world": "my", "add_really": true}}'
 ```
 
-This makefile snippet generates the code from proto to our `golang/example/helloworld` directory. It has to have `protoc`, `protoc-gen-go` and `protoc-gen-openconfig` binaries installed (I know that's bit a lot 💩 - complains should go to profobuf ecosystem)
+All the above should print `(really!) Hello my world for "Alt C" in 2077 year!`
 
-1. Once generated repeat same process with running executable and executor as previously.
+6. Run configurator to check if all applications returns expected message by running: `go run ./configurator`
+
+7. Read [`./configurator`](/golang/examples/helloworld/configurator/main.go) to check all different ways to configure `helloworld` `configurable`
+with and without `OpenConfig 1.0`!
+
+#### Updating Configuration Proto Definition
+
+TBD (tl;dr: `make proto`)

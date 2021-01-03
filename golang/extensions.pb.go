@@ -38,15 +38,25 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
-// TODO(bwplotka): Make it non pointers (in Go).
+/// Metadata is an Message option that when put on message indicates an entry point for certain configuration.
+/// One `Configuration Proto Definition` can have many structs marked as this option.
+/// TODO(bwplotka): Make it non pointers (in Go).
 type Metadata struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name        string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	/// name represents name of annotated configuration entry point.
+	/// It's recommended to use executable name here.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	/// version is the semantic version of the annotated configuration.
 	Version     string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	/// delivery_mechanism optionally specifies the delivery that is implemented by configurable that consumes this
+	/// configuration. This allows `Configurator` to discover how to pass the `Encoded Configuration Message`
+	/// without extra information outside of definition.
+	// TODO(bwplotka): This might be blocking reusability. Rethink?
+	//
 	// Types that are assignable to DeliveryMechanism:
 	//	*Metadata_StdinDelivery
 	//	*Metadata_FlagDelivery
@@ -186,6 +196,8 @@ type FlagDelivery struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	/// name represents custom flag name (including `-` if any) for a flag that consumes bytes of `Encoded Configuration Message`
+	// OpenConfig 1.0 recommends `--openconfigv1` name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 }
 
@@ -261,22 +273,44 @@ var file_openconfig_v1_extensions_proto_extTypes = []protoimpl.ExtensionInfo{
 		Tag:           "varint,5002,opt,name=required",
 		Filename:      "openconfig/v1/extensions.proto",
 	},
+	{
+		ExtendedType:  (*descriptor.FieldOptions)(nil),
+		ExtensionType: (*bool)(nil),
+		Field:         5003,
+		Name:          "openconfig.v1.experimental",
+		Tag:           "varint,5003,opt,name=experimental",
+		Filename:      "openconfig/v1/extensions.proto",
+	},
 }
 
 // Extension fields to descriptor.MessageOptions.
 var (
+	/// metadata represents
+	//
 	// optional openconfig.v1.Metadata metadata = 5000;
 	E_Metadata = &file_openconfig_v1_extensions_proto_extTypes[0]
 )
 
 // Extension fields to descriptor.FieldOptions.
 var (
+	/// default represents an option that sets a default value for the field.
+	//
 	// optional string default = 5000;
 	E_Default = &file_openconfig_v1_extensions_proto_extTypes[1]
+	/// hidden represents an option that marks a field as hidden. What it actually causes is up to the Configurable.
+	/// OpenConfig 1.0 recommends hiding it from the documentation.
+	//
 	// optional bool hidden = 5001;
 	E_Hidden = &file_openconfig_v1_extensions_proto_extTypes[2]
+	/// required represents an option that marks a field as mandatory and if empty, Configurable does not accept the whole configuration.
+	//
 	// optional bool required = 5002;
 	E_Required = &file_openconfig_v1_extensions_proto_extTypes[3]
+	/// experimental represents an option that marks a field as experimental. What it actually causes is up to the Configurable.
+	/// OpenConfig 1.0 recommends warning in the documentation.
+	//
+	// optional bool experimental = 5003;
+	E_Experimental = &file_openconfig_v1_extensions_proto_extTypes[4]
 )
 
 var File_openconfig_v1_extensions_proto protoreflect.FileDescriptor
@@ -322,11 +356,15 @@ var file_openconfig_v1_extensions_proto_rawDesc = []byte{
 	0x08, 0x72, 0x65, 0x71, 0x75, 0x69, 0x72, 0x65, 0x64, 0x12, 0x1d, 0x2e, 0x67, 0x6f, 0x6f, 0x67,
 	0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c,
 	0x64, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x8a, 0x27, 0x20, 0x01, 0x28, 0x08, 0x52,
-	0x08, 0x72, 0x65, 0x71, 0x75, 0x69, 0x72, 0x65, 0x64, 0x42, 0x33, 0x5a, 0x31, 0x67, 0x69, 0x74,
-	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x74, 0x68, 0x61, 0x6e, 0x6f, 0x73, 0x2d, 0x69,
-	0x6f, 0x2f, 0x4f, 0x70, 0x65, 0x6e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2f, 0x67, 0x6f, 0x6c,
-	0x61, 0x6e, 0x67, 0x3b, 0x6f, 0x70, 0x65, 0x6e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x08, 0x72, 0x65, 0x71, 0x75, 0x69, 0x72, 0x65, 0x64, 0x3a, 0x42, 0x0a, 0x0c, 0x65, 0x78, 0x70,
+	0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e, 0x74, 0x61, 0x6c, 0x12, 0x1d, 0x2e, 0x67, 0x6f, 0x6f, 0x67,
+	0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c,
+	0x64, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x8b, 0x27, 0x20, 0x01, 0x28, 0x08, 0x52,
+	0x0c, 0x65, 0x78, 0x70, 0x65, 0x72, 0x69, 0x6d, 0x65, 0x6e, 0x74, 0x61, 0x6c, 0x42, 0x33, 0x5a,
+	0x31, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x74, 0x68, 0x61, 0x6e,
+	0x6f, 0x73, 0x2d, 0x69, 0x6f, 0x2f, 0x4f, 0x70, 0x65, 0x6e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67,
+	0x2f, 0x67, 0x6f, 0x6c, 0x61, 0x6e, 0x67, 0x3b, 0x6f, 0x70, 0x65, 0x6e, 0x63, 0x6f, 0x6e, 0x66,
+	0x69, 0x67, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -356,11 +394,12 @@ var file_openconfig_v1_extensions_proto_depIdxs = []int32{
 	4, // 3: openconfig.v1.default:extendee -> google.protobuf.FieldOptions
 	4, // 4: openconfig.v1.hidden:extendee -> google.protobuf.FieldOptions
 	4, // 5: openconfig.v1.required:extendee -> google.protobuf.FieldOptions
-	0, // 6: openconfig.v1.metadata:type_name -> openconfig.v1.Metadata
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	6, // [6:7] is the sub-list for extension type_name
-	2, // [2:6] is the sub-list for extension extendee
+	4, // 6: openconfig.v1.experimental:extendee -> google.protobuf.FieldOptions
+	0, // 7: openconfig.v1.metadata:type_name -> openconfig.v1.Metadata
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	7, // [7:8] is the sub-list for extension type_name
+	2, // [2:7] is the sub-list for extension extendee
 	0, // [0:2] is the sub-list for field type_name
 }
 
@@ -418,7 +457,7 @@ func file_openconfig_v1_extensions_proto_init() {
 			RawDescriptor: file_openconfig_v1_extensions_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   3,
-			NumExtensions: 4,
+			NumExtensions: 5,
 			NumServices:   0,
 		},
 		GoTypes:           file_openconfig_v1_extensions_proto_goTypes,
