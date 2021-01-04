@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+// Proto Config Extensions Format 1.0.
+//
+// This defines extensions to protocol-buffer-compatible language that is build on proto version 3 with protobuf custom options.
+//
+// ProtoConfig Extensions allows software authors to define metadata about required configuration like default values or field
+// optionality etc.
+//
+// Extension can be used as natively described in https://developers.google.com/protocol-buffers/docs/proto#customoptions
+//
+// Below extensions are not mandatory to use while defining your configuration, but mandatory to be implemented by
+// ProtoConfig 1.0 compatible parsers and generators.
+package protoconfig.v1;
+
+option go_package = "github.com/protoconfig/protoconfig/go;protoconfig";
+
+import "google/protobuf/descriptor.proto";
+
+/// Metadata is an Message option that when put on message indicates an entry point for certain configuration.
+/// One `Configuration Proto Definition` can have many structs marked as this option.
+/// TODO(bwplotka): Make it non pointers (in Go).
+message Metadata {
+    /// name represents name of annotated configuration entry point.
+    /// It's recommended to use executable name here.
+    string name = 1;
+    /// version is the semantic version of the annotated configuration.
+    string version = 2;
+    string description = 3;
+
+    /// delivery_mechanism optionally specifies the delivery that is implemented by configurable that consumes this
+    /// configuration. This allows `Configurator` to discover how to pass the `Encoded Configuration Message`
+    /// without extra information outside of definition.
+    // TODO(bwplotka): This might be blocking reusability. Rethink?
+    oneof delivery_mechanism {
+        StdinDelivery stdin_delivery = 101;
+        FlagDelivery flag_delivery = 102;
+    }
+}
+
+message StdinDelivery {}
+
+message FlagDelivery {
+    /// name represents custom flag name (including `-` if any) for a flag that consumes bytes of `Encoded Configuration Message`
+    // ProtoConfig 1.0 recommends `--protoconfigv1` name.
+    string name = 1;
+}
+
+extend google.protobuf.MessageOptions {
+    /// metadata represents
+    Metadata metadata = 5000;
+}
+
+extend google.protobuf.FieldOptions {
+    /// default represents an option that sets a default value for the field.
+    string default = 5000;
+    /// hidden represents an option that marks a field as hidden. What it actually causes is up to the Configurable.
+    /// ProtoConfig 1.0 recommends hiding it from the documentation.
+    bool hidden   = 5001;
+    /// required represents an option that marks a field as mandatory and if empty, Configurable does not accept the whole configuration.
+    bool required = 5002;
+    /// experimental represents an option that marks a field as experimental. What it actually causes is up to the Configurable.
+    /// ProtoConfig 1.0 recommends warning in the documentation.
+    bool experimental = 5003;
+
+}

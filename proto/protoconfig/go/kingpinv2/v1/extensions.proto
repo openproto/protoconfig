@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+// Extensions based on https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2
+package protoconfig.golang.kingpinv2.v1;
+
+option go_package = "github.com/protoconfig/protoconfig/go/kingpinv2;kingpinv2";
+
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/any.proto";
+
+// TODO(bwplotka): Add more kingpin.v2 flag types https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2
+// TODO: Add more.
+
+// Content is byte steam created from PathOrContent flag, a custom extension built on top of kingpin.v2 flags type.
+message Content {
+    google.protobuf.Any content = 1; // any proto.Message
+}
+
+// ExistingFile represents https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2#ArgClause.ExistingFile.
+// repeated ExistingFile represents https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2#ArgClause.ExistingFiles.
+message ExistingFile {
+    google.protobuf.Any file = 1; // *os.File
+}
+
+// IP represents https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2#ArgClause.IP.
+// repeated IP represents https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2#ArgClause.IPList.
+message IP {
+    google.protobuf.Any ip = 1; // *net.IP
+}
+
+// Regexp represents https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2#ArgClause.Regexp.
+// repeated Regexp represents https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2#ArgClause.RegexpList.
+message Regexp {
+    google.protobuf.Any regexp = 1; // **regexp.Regexp
+}
+
+extend google.protobuf.FieldOptions {
+    string placeholder = 6000;
+    string envvar   = 6001;
+    // By default field represents a flag.
+    bool argument = 6002;
+}
+
+message Command {
+    string name = 1;
+}
+
+extend google.protobuf.MessageOptions {
+    // By default message represents just complex configuration type. If command_name is specified
+    // such message becomes a kingpin.v2 command.
+    // Name has to be unique within single protoconfig.Configuration type.
+    Command command = 6002;
+}

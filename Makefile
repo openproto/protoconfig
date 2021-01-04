@@ -14,10 +14,10 @@ lint: $(BUF) docs
 	@echo ">> lint proto files"
 	@$(BUF) check lint
 	$(call require_clean_work_tree,"detected changed files - run make lint and commit changes.")
-	@echo ">> lint golang files"
-	@$(MAKE) -C golang lint
+	@echo ">> lint go files"
+	@$(MAKE) -C go lint
 	$(call require_clean_work_tree,"detected changed files - run make lint and commit changes.")
 
 .PHONY: proto
 proto:
-	@$(MAKE) -C ./golang proto
+	@$(MAKE) -C ./go proto

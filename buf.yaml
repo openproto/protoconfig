@@ -10,9 +10,9 @@ lint:
     ENUM_ZERO_VALUE_SUFFIX:
       - examples/helloworld/v1/helloworld.proto
   ignore:
-    # per the lint configuration docs, the paths for lint ignores have the root
+    # Per the lint configuration docs, the paths for lint ignores have the root
     # directory stripped so that this configuration works for both sources and images
-    # google/api and google/rpc are the directories within googleapis/ that we want to ignore
+    # google/api and google/rpc are the directories within googleapis/ that we want to ignore.
     - google/protobuf/descriptor.proto
   use:
     - DEFAULT
