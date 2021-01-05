@@ -6,7 +6,7 @@ The `ProtoConfig 1.0` is an open, language agnostic specification that describes
 
 *Like OpenAPI but for Configuration!*
 
-Designed to work support all popular configuration patterns: Cloud Native `Configuration as Code`, robust command line interfaces (CLI), static or dynamic configurability and remote configuration APIs.
+Designed to support all popular configuration patterns: Cloud Native `Configuration as a Code`, robust command line interfaces (CLI), static or dynamic configurability as well as remote configuration APIs.
 
 ### TL;DR
 
