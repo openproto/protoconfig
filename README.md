@@ -2,9 +2,11 @@
 
 [![golang docs](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/protoconfig/protoconfig/go) [![Latest Release](https://img.shields.io/github/release/protoconfig/protoconfig.svg?style=flat-square)](https://github.com/protoconfig/protoconfig/releases/latest)
 
-The `ProtoConfig 1.0` is a specification that describes a process of using, defining, and consuming software configuration input in a unified way.
+The `ProtoConfig 1.0` is an open, language agnostic specification that describes a process of using, defining, and consuming software configuration input in a unified way.
 
-*Like gRPC or OpenAPI but for Application (static or dynamic) Configuration.*
+*Like OpenAPI but for Configuration!*
+
+Designed to work support all popular configuration patterns: Cloud Native `Configuration as Code`, robust command line interfaces (CLI), static or dynamic configurability and remote configuration APIs.
 
 ### TL;DR
 
@@ -31,7 +33,7 @@ Configure software in a way that is:
 
 ### Motivation
 
-See ["Configuration in 2021 is still broken"](https://deploy-preview-26--bwplotka.netlify.app/2020/configuring-sw-is-broken/)
+See "Configuration in 2021 is still broken" blog post (TBD).
 
 ### Principles
 
@@ -62,6 +64,13 @@ If you are not familiar with Go, this is still a useful example, as the flow and
 Any help wanted. Do you have an idea, want to help, don't know how to start helping?
 
 Put an issue on this repo, create PR or ping us on the CNCF Slack (`@bwplotka`, `@brancz`)! 🤗
+
+## Other related projects
+
+* [OpenConfig](https://www.openconfig.net/): OpenConfig aims for something very similar, however aimed for network management configuration. Defined in `YANG` (some sort of `XML`) instead of more modern `protobuf` which was designed for code generation and IDL.
+* [protoconf](https://github.com/protoconf/protoconf): Amazing project inspired by Facebook's Configurator. While sounding similar it's essentially a protobuf based dynamic configuration with its own GitOps pipeline. `ProtoConfig` does not specify how to 
+  do dynamic configuration, leaving that to extensions that can be added to specification itself (e.g language specific generator that generates lib for dynamic reloading).
+* [OpenAPI/Swagger](https://swagger.io/specification/): OpenAPI aims for API definitions. Configuration can be treated as some part of the API (payload?), however scoping definition purely for configuration, simplifies the whole topic a lot. `ProtoConfig` does not need to care about status codes, HTTP specifics or actually even OS/Process details. `ProtoConfig` can be applied   
 
 ### Roadmap
 
