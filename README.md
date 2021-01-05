@@ -1,21 +1,21 @@
-# OpenConfig 1.0
+# ProtoConfig 1.0
 
-[![golang docs](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/thanos-io/OpenConfig/golang) [![Latest Release](https://img.shields.io/github/release/thanos-io/OpenConfig.svg?style=flat-square)](https://github.com/thanos-io/OpenConfig/releases/latest)
+[![golang docs](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/protoconfig/protoconfig/go) [![Latest Release](https://img.shields.io/github/release/protoconfig/protoconfig.svg?style=flat-square)](https://github.com/protoconfig/protoconfig/releases/latest)
 
-The `OpenConfig 1.0` is a specification that describes a process of using, defining, and consuming software configuration input in a unified way.
+The `ProtoConfig 1.0` is a specification that describes a process of using, defining, and consuming software configuration input in a unified way.
 
 *Like gRPC or OpenAPI but for Application (static or dynamic) Configuration.*
 
 ### TL;DR
 
-The `OpenConfig 1.0` standardises application configuration, by describing the process as follows:
+The `ProtoConfig 1.0` standardises application configuration, by describing the process as follows:
 
 1. Application developer creates a [.proto](https://developers.google.com/protocol-buffers) file with `Configuration Proto Definition`, that defines what exactly options application has.
 2. Thanks to the single source of truth for your app configuration, a developer can generate a data structure in the language they need. Such structs/classes can be then used to parse incoming input in native proto or JSON encoding (for example from `stdin`, CLI flag or HTTP API, etc).
-* `OpenConfig` allows generation extensibility, so such definition can be also used to generate documentation, `--help`, `man`, custom types, or even whole CLI flag & args parsing code. Options are unlimited!
-3. Following the `OpenConfig` convention, a human or program can now configure the application either by specifying JSON manually or by generating (again) data structure from `Configuration Proto Definition` in the programming language they want. Such struct/class is typed (if a language is typed), have a valid format, have help commentaries and can be encoded to `protobuf` supported format and passed to the `configurable` application!
+* `ProtoConfig` allows generation extensibility, so such definition can be also used to generate documentation, `--help`, `man`, custom types, or even whole CLI flag & args parsing code. Options are unlimited!
+3. Following the `ProtoConfig` convention, a human or program can now configure the application either by specifying JSON manually or by generating (again) data structure from `Configuration Proto Definition` in the programming language they want. Such struct/class is typed (if a language is typed), have a valid format, have help commentaries and can be encoded to `protobuf` supported format and passed to the `configurable` application!
 
-`OpenConfig 1.0` standard specifies that every `OpenConfig 1.0` compatible application accepts encoded `protobuf` in proto or JSON format as the way of configuring itself. Either as the only way or in addition to other conventions (e.g args and flags).
+`ProtoConfig 1.0` standard specifies that every `ProtoConfig 1.0` compatible application accepts encoded `protobuf` in proto or JSON format as the way of configuring itself. Either as the only way or in addition to other conventions (e.g args and flags).
 
 ![Open Config 1.0](https://docs.google.com/drawings/d/e/2PACX-1vSANZkljSiDgV-o0a-dL0ryZz19p3Hblt5V_qozhBcY5ILq8j3T2GEAdCCHFHoSGT9h2H4LDqJ9bCn_/pub?w=1440&h=1080)
 
@@ -27,7 +27,7 @@ Configure software in a way that is:
 * **Allows Auto Generation**: *We don't need to manually implement application client or data format to encode and similarly data format to parse. All can be safely generated thanks to `protobuf` in almost any programming language, thanks to the wide plugin ecosystem. Additionally, you can generate a full CLI flag paring code or even documentation(!). It also means the smallest, possible impact in the event of application upgrade or modification. Type, Default, or even Help changed can be easily tracked in any language.*
 * **Easy to Verify**: *Non-semantic verification and validation (e.g ) do not require executable participation. No need for CLI --dry-run logic, or even invoking anything external. All can be validated from the point of `protobuf`.* https://github.com/envoyproxy/protoc-gen-validate
 * **Backward & Forward Compatible**: *Smooth version migrations, thanks to `protobuf` guarantee and safety checkers like [`buf check breaking`](https://docs.buf.build/breaking-usage)*
-* **Extensible**: *On top of [**OpenConfig Proto Extensions Format 1.0.**](proto/openconfig/v1/extensions.proto) this specification allows CLI or language-specific extensions (e.g see [`kingpinv2` Go package](golang/kingpinv2) and its [extensions](golang/kingpinv2/proto/openconfig/kingpinv2/v1/extensions.proto))*
+* **Extensible**: *On top of [**Proto Config Extensions Format 1.0.**](proto/protoconfig/v1/extensions.proto) this specification allows CLI or language-specific extensions (e.g see [`kingpinv2` Go package](go/kingpinv2) and its [extensions](go/kingpinv2/proto/protoconfig/kingpinv2/v1/extensions.proto))*
 
 ### Motivation
 
@@ -43,7 +43,7 @@ See [./specification#why-protocol-buffers](specification.md#why-protocol-buffers
 
 ### Example
 
-See [example in Go](golang/README.md).
+See [example in Go](go/README.md).
 
 If you are not familiar with Go, this is still a useful example, as the flow and pattern will be similar to any language.
 
@@ -51,11 +51,11 @@ If you are not familiar with Go, this is still a useful example, as the flow and
 
 | Item   | What | Status |
 |--------|------|--------|
-| [`proto/openconfig/v1/extensions.proto`](proto/openconfig/v1/extensions.proto)  |  *OpenConfig Proto Extensions Format 1.0* | Alpha |
+| [`proto/protoconfig/v1/extensions.proto`](proto/protoconfig/v1/extensions.proto)  |  *Proto Config Extensions Format 1.0* | Alpha |
 | [`proto/examples/helloworld/v1/helloworld.proto`]( proto/examples/helloworld/v1/helloworld.proto) |  Example *Configuration Proto Definitions (CPD)* | Alpha |
-| [`golang/`](golang)  | Go module with (optional) *OpenConfig Proto Extensions Format 1.0* bindings | Alpha |
-| [`golang/protoc-gen-go-openconfig`](golang/protoc-gen-go-openconfig/README.md)  | Go module with (optional) protogen go plugin supporting *OpenConfig Proto Extensions Format 1.0* Go language  | Alpha |
-| [`golang/examples`](golang/examples/README.md) | Go module with (optional) protogen go plugin supporting *OpenConfig Proto Extensions Format 1.0* Go language  | Alpha |
+| [`go/`](go)  | Go module with (optional) *Proto Config Extensions Format 1.0* bindings | Alpha |
+| [`go/protoc-gen-go-protoconfig`](go/protoc-gen-go-protoconfig/README.md)  | Go module with (optional) protogen go plugin supporting *Proto Config Extensions Format 1.0* Go language  | Alpha |
+| [`go/examples`](go/examples/README.md) | Go module with (optional) protogen go plugin supporting *Proto Config Extensions Format 1.0* Go language  | Alpha |
 
 ### Contributing
 
@@ -67,8 +67,8 @@ Put an issue on this repo, create PR or ping us on the CNCF Slack (`@bwplotka`, 
 
 Help wanted!
 
-* [ ] Documentation for using OpenConfig 1.0 by different language than supported by this repo.
-* [ ] Documentation for writing OpenConfig 1.0 plugin for a different language than supported by this repo.
+* [ ] Documentation for using ProtoConfig 1.0 by different language than supported by this repo.
+* [ ] Documentation for writing ProtoConfig 1.0 plugin for a different language than supported by this repo.
 * [ ] Publish formal RFC-compatible specification, finish it, add recommendations (e.g package names).
 * [ ] Document extensibility.
 * [ ] Add example if any configuration templating engine.

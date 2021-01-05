@@ -1,22 +1,22 @@
 syntax = "proto3";
 
-import "openconfig/v1/extensions.proto";
-import "openconfig/golang/kingpinv2/v1/extensions.proto";
+import "protoconfig/v1/extensions.proto";
+import "protoconfig/go/kingpinv2/v1/extensions.proto";
 
-option go_package = "github.com/thanos-io/OpenConfig/golang/examples/helloworld;helloworldpb";
+option go_package = "github.com/protoconfig/protoconfig/go/examples/helloworld;helloworldpb";
 option java_multiple_files = true;
-option java_package = "com.github.openconfig.examples.helloworld";
+option java_package = "com.github.protoconfig.examples.helloworld";
 option java_outer_classname = "HelloWorldProto";
 
 package examples.helloworld.v1;
 
 message HelloWorldConfiguration {
-    option (openconfig.v1.metadata) = {
+    option (protoconfig.v1.metadata) = {
         name: "configurable"
         version: "0.1.0"
-        description: "example application to showcase OpenConfig 1.0."
+        description: "example application to showcase ProtoConfig 1.0."
 
-        flag_delivery: { name: "--openconfigv1" }
+        flag_delivery: { name: "--protoconfigv1" }
     };
 
     oneof command {
@@ -33,19 +33,19 @@ enum Lang {
 }
 
 message HelloCommand {
-    option (openconfig.golang.kingpinv2.v1.command) = {name :"hello" };
+    option (protoconfig.golang.kingpinv2.v1.command) = {name :"hello" };
 
-    string name = 1 [(openconfig.v1.required) = true];
-    int64 year = 2 [(openconfig.v1.default) = "2021"];
+    string name = 1 [(protoconfig.v1.required) = true];
+    int64 year = 2 [(protoconfig.v1.default) = "2021"];
     string world = 3;
     Lang lang = 4;
 
     bool please_add_really = 5 [deprecated = true];
-    bool add_really = 6 [(openconfig.v1.hidden) = true];
+    bool add_really = 6 [(protoconfig.v1.hidden) = true];
 }
 
 message ByeCommand {
-    option (openconfig.golang.kingpinv2.v1.command) = {name :"bye" };
+    option (protoconfig.golang.kingpinv2.v1.command) = {name :"bye" };
 
     Lang lang = 1;
     oneof command {
@@ -55,11 +55,11 @@ message ByeCommand {
 }
 
 message ByeJustCommand {
-    option (openconfig.golang.kingpinv2.v1.command) = {name :"just" };
+    option (protoconfig.golang.kingpinv2.v1.command) = {name :"just" };
 }
 
 message ByeConfigurableCommand {
-    option (openconfig.golang.kingpinv2.v1.command) = {name :"configurable" };
+    option (protoconfig.golang.kingpinv2.v1.command) = {name :"configurable" };
 
     string config_id = 1;
     ByeConfiguration config = 2;

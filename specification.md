@@ -1,4 +1,4 @@
-# OpenConfig, a software configuration convention
+# `ProtoConfig` 1.0, an open, language agnostic software configuration specification
 
 **Status**: `Alpha`.
 
@@ -11,21 +11,21 @@ Two main sides exist during the software configuration process:
 * `Configurable`: Software we want to configure, statically (during startup) or dynamically (on the run)
 * `Configurator`: Another software or human user that desires to configure the `Configurable` automatically or manually (human).
 
-The key element of `OpenConfig` specification is a strict format and rules of the `Configuration Definition`. This definition is the true single language that both `Configurator` and `Configurable` can use as shown in the below diagram:
+The key element of `ProtoConfig 1.0` specification is a strict format and rules of the `Configuration Proto Definition`. This definition is the true single language that both `Configurator` and `Configurable` can use as shown in the below diagram:
 
-![OpenConfig](https://docs.google.com/drawings/d/e/2PACX-1vSANZkljSiDgV-o0a-dL0ryZz19p3Hblt5V_qozhBcY5ILq8j3T2GEAdCCHFHoSGT9h2H4LDqJ9bCn_/pub?w=1440&h=1080)
+![ProtoConfig](https://docs.google.com/drawings/d/e/2PACX-1vSANZkljSiDgV-o0a-dL0ryZz19p3Hblt5V_qozhBcY5ILq8j3T2GEAdCCHFHoSGT9h2H4LDqJ9bCn_/pub?w=1440&h=1080)
 
-The `OpenConfig 1.0` standard specifies that, in order for a `Configurable` (Software) to be `OpenConfig 1.0` compliant, it shall have one `Configuration Proto Definition`, which shall be the [source of truth](https://en.wikipedia.org/wiki/Single_source_of_truth) of its configuration input. Such a `Configuration Proto Definition` (called further `CPD`) shall meet the following requirements:
+The `ProtoConfig 1.0` standard specifies that, in order for a `Configurable` (Software) to be `ProtoConfig 1.0` compliant, it shall have one `Configuration Proto Definition`, which shall be the [source of truth](https://en.wikipedia.org/wiki/Single_source_of_truth) of its configuration input. Such a `Configuration Proto Definition` (called further `CPD`) shall meet the following requirements:
 
 * Shall be stored and versioned together with the software itself (e.g in the same repository).
 * Shall be compatible with [Protocol Buffer Version 3](https://developers.google.com/protocol-buffers/docs/reference/proto3-spec) specification.
 * Shall define all the configuration options the `Configurable` exposes.
-* Can use [**OpenConfig Proto Extensions Format 1.0.**](proto/openconfig/v1/extensions.proto) which might be useful for more advanced configuration options.
+* Can use [**Proto Config Extensions Format 1.0.**](proto/protoconfig/v1/extensions.proto) which might be useful for more advanced configuration options.
 * Can use any other [proto](https://developers.google.com/protocol-buffers) extension or important one or more `CPD` from other software.
 
-Furthermore, additionally, to `CPD`, the `OpenConfig 1.0` specifies the `Encoded Configuration Message` (called further `ECM`), which is a configuration information serialized into the stream of bytes in [`protobuf "byte" encoding`](https://developers.google.com/protocol-buffers/docs/encoding) or [`JSON encoding`](https://developers.google.com/protocol-buffers/docs/proto3#json) format based on specific `Configuration Proto Definition (CPD)`.
+Furthermore, additionally, to `CPD`, the `ProtoConfig 1.0` specifies the `Encoded Configuration Message` (called further `ECM`), which is a configuration information serialized into the stream of bytes in [`protobuf "byte" encoding`](https://developers.google.com/protocol-buffers/docs/encoding) or [`JSON encoding`](https://developers.google.com/protocol-buffers/docs/proto3#json) format based on specific `Configuration Proto Definition (CPD)`.
 
-`OpenConfig 1.0` specifies `Configuration Process` as passing the `Encoded Configuration Message (ECM)` to `Configurable` in order to control programmed options it exposes.
+`ProtoConfig 1.0` specifies `Configuration Process` as passing the `Encoded Configuration Message (ECM)` to `Configurable` in order to control programmed options it exposes.
 If the `ECM` is passed and parsed at the start of the application before anything else (e.g starting functionalities) it's called `Static Configuration Process (SCP)`. For example, reading `ECM` from a file on start or reading `ECM` from the CLI flag. If `ECM` is passed and configuration is performed during further execution of the `Configurable` execution it's called `Dynamic Configuration Process (DCP)` Watching the file with `ECM` for modifying events and reloading internal components when those occur based on new `ECM` input, or accepting `ECM` on HTTP endpoint are examples of `DCP`.
 
 The `Configurable` shall implement either `SCP` or `DCP` or both. `SCP` is recommended for simplicity, explicitness, and lower complexity on `Configurable` side reasons.
@@ -37,7 +37,7 @@ Additionally:
 * [`protobuf "byte" encoding`](https://developers.google.com/protocol-buffers/docs/encoding) can be supported, but it's recommended to not use it for most of the cases. The reason is that configuration has to be verbose, simple, and explicit. Ideally, the software is configured statically on the start and all its configuration is visible with a quick glance on CLI invocation. See further rationales [here](https://www.bwplotka.dev/2020/flagarize/#flags-ftw).
 * `Configurable` should accept empty or partially empty `ECM` by providing safe and minimalistic defaults.
 
-Overall, `OpenConfig 1.0` recommends allowing `SCP` rather `SPD`, by accepting `json` based `ECM` through the `--openconfig.v1` CLI flag.
+Overall, `ProtoConfig 1.0` recommends allowing `SCP` rather `SPD`, by accepting `json` based `ECM` through the `--protoconfig.v1` CLI flag.
 
 ## Why Protocol Buffers?
 
@@ -59,10 +59,10 @@ Configure software in a way that is:
 * **Allows Auto Generation**: *We don't need to manually implement application client or data format to encode and similarly data format to parse. All can be safely generated thanks to `protobuf` in almost any programming language, thanks to the wide plugin ecosystem. Additionally, you can generate a full CLI flag paring code or even documentation(!). It also means the smallest, possible impact in the event of application upgrade or modification. Type, Default, or even Help changed can be easily tracked in any language.*
 * **Easy to Verify**: *Non-semantic verification and validation (e.g ) do not require executable participation. No need for CLI --dry-run logic, or even invoking anything external. All can be validated from the point of `protobuf`.* https://github.com/envoyproxy/protoc-gen-validate
 * **Backward & Forward Compatible**: *Smooth version migrations, thanks to `protobuf` guarantee and safety checkers like [`buf check breaking`](https://docs.buf.build/breaking-usage)*
-* **Extensible**: *On top of [**OpenConfig Proto Extensions Format 1.0.**](proto/openconfig/v1/extensions.proto) this specification allows CLI or language-specific extensions (e.g see [`kingpinv2` Go package](golang/kingpinv2) and its [extensions](golang/kingpinv2/proto/openconfig/kingpinv2/v1/extensions.proto))*
+* **Extensible**: *On top of [**Proto Config Extensions Format 1.0.**](proto/protoconfig/v1/extensions.proto) this specification allows CLI or language-specific extensions (e.g see [`kingpinv2` Go package](go/kingpinv2) and its [extensions](go/kingpinv2/proto/protoconfig/kingpinv2/v1/extensions.proto))*
 
 ## Not in the scope
 
 * Runtime APIs, RPCs, and Invocation semantics (e.g error codes, output, input).
-* Configuration or Invocation API that will accept (e.g dynamically or statically) for configuration in `OpenConfig` format.
+* Configuration or Invocation API that will accept (e.g dynamically or statically) for configuration in `ProtoConfig` format.
 * Discoverability of `Configuration Proto Definitions` details.
