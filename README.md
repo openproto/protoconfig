@@ -45,7 +45,7 @@ See [./specification#why-protocol-buffers](specification.md#why-protocol-buffers
 
 ### Example
 
-See [example in Go](go/README.md).
+See [example in Go](go/examples/README.md).
 
 If you are not familiar with Go, this is still a useful example, as the flow and pattern will be similar to any language.
 
