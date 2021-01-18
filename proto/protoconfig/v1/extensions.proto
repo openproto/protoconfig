@@ -13,7 +13,7 @@ syntax = "proto3";
 // ProtoConfig 1.0 compatible parsers and generators.
 package protoconfig.v1;
 
-option go_package = "github.com/protoconfig/protoconfig/go;protoconfig";
+option go_package = "github.com/openproto/protoconfig/go;protoconfig";
 
 import "google/protobuf/descriptor.proto";
 

@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	helloworldpb "github.com/protoconfig/protoconfig/go/examples/helloworld"
+	helloworldpb "github.com/openproto/protoconfig/go/examples/helloworld"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 

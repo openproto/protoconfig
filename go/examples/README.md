@@ -17,7 +17,7 @@ For installation instructions, see [Protocol Buffer Compiler Installation](https
   ```bash
   export GO111MODULE=on  # Enable module mode
   go get google.golang.org/protobuf/cmd/protoc-gen-go \
-    github.com/protoconfig/protoconfig/go/protoc-gen-go-protoconfig
+    github.com/openproto/protoconfig/go/protoc-gen-go-protoconfig
   ```
 
     1. Update your PATH so that the protoc compiler can find the plugins:
@@ -38,7 +38,7 @@ This file is just `.proto` with a couple of options from few extensions:
 The power of `ProtoConfig 1.0` comes from `protobuf` superpowers: Those options are fully ignored if your `protoc` does not have plugins supporting them (for example you generate data structures for C++ or Java!). This allows ultimate extensibility.
 
 2. This example has already generated Go code from this `helloworld` application `Configuration Proto Definition`, and you can see it [go/examples/helloworld/helloworld.pb.go](/go/examples/helloworld/helloworld.pb.go) and [go/examples/helloworld/helloworld_protoconfig.pb.go](/go/examples/helloworld/helloworld_protoconfig.pb.go). Since it's generated code,
-   it's not readable much. Check [go.dev](https://pkg.go.dev/github.com/protoconfig/protoconfig/go/examples) instead! (It's go code after all and supports `godoc`!)
+   it's not readable much. Check [go.dev](https://pkg.go.dev/github.com/openproto/protoconfig/go/examples) instead! (It's go code after all and supports `godoc`!)
    
 What you see is the `protobuf` Go code that allows to marshal and unmarshal filled types in to `ProtoConfig 1.0` (and proto) compliant encoding.
    

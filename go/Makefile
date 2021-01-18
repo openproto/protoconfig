@@ -19,7 +19,7 @@ all: format build
 .PHONY: build
 build: ## Build protoc-gen-go-protoconfig.
 	@echo ">> building $(MODULE_GEN_GO)"
-	@cd $(MODULE_GEN_GO) && GOBIN=$(GOBIN) go install github.com/protoconfig/protoconfig/go/protoc-gen-go-protoconfig
+	@cd $(MODULE_GEN_GO) && GOBIN=$(GOBIN) go install github.com/openproto/protoconfig/go/protoc-gen-go-protoconfig
 
 .PHONY: deps
 deps: ## Ensures fresh go.mod and go.sum.
@@ -55,18 +55,18 @@ proto: build $(BUF) $(PROTOC_GEN_GO)
 	@echo ">> generating $(REPO_ROOT_DIR)/proto/protoconfig/v1/extensions.proto in $(REPO_ROOT_DIR)/go"
 	@PATH=$(GOBIN):$(TMP_GOBIN) $(BUF) protoc \
 		-I $(REPO_ROOT_DIR)/proto \
-		--go_out=$(REPO_ROOT_DIR)/go --go_opt=module="github.com/protoconfig/protoconfig/go" \
+		--go_out=$(REPO_ROOT_DIR)/go --go_opt=module="github.com/openproto/protoconfig/go" \
 	    $(REPO_ROOT_DIR)/proto/protoconfig/v1/extensions.proto
 	@echo ">> generating $(REPO_ROOT_DIR)/proto/protoconfig/go/kingpinv2/v1/extensions.proto in $(REPO_ROOT_DIR)/go/kingpinv2"
 	@PATH=$(GOBIN):$(TMP_GOBIN) $(BUF) protoc \
 		-I $(REPO_ROOT_DIR)/proto \
-		--go_out=$(REPO_ROOT_DIR)/go/kingpinv2 --go_opt=module="github.com/protoconfig/protoconfig/go/kingpinv2" \
+		--go_out=$(REPO_ROOT_DIR)/go/kingpinv2 --go_opt=module="github.com/openproto/protoconfig/go/kingpinv2" \
 		$(REPO_ROOT_DIR)/proto/protoconfig/go/kingpinv2/v1/extensions.proto
 	@echo ">> generating $(REPO_ROOT_DIR)/proto/examples/helloworld/v1/helloworld.proto in $(REPO_ROOT_DIR)/go/examples/helloworld/"
 	@PATH=$(GOBIN):$(TMP_GOBIN) $(BUF) protoc \
 		-I $(REPO_ROOT_DIR)/proto \
-		--go_out=$(REPO_ROOT_DIR)/go/examples/helloworld/ --go_opt=module="github.com/protoconfig/protoconfig/go/examples/helloworld" \
-	   	--go-protoconfig_out=$(REPO_ROOT_DIR)/go/examples/helloworld/ --go-protoconfig_opt=module="github.com/protoconfig/protoconfig/go/examples/helloworld" \
+		--go_out=$(REPO_ROOT_DIR)/go/examples/helloworld/ --go_opt=module="github.com/openproto/protoconfig/go/examples/helloworld" \
+	   	--go-protoconfig_out=$(REPO_ROOT_DIR)/go/examples/helloworld/ --go-protoconfig_opt=module="github.com/openproto/protoconfig/go/examples/helloworld" \
 	    $(REPO_ROOT_DIR)/proto/examples/helloworld/v1/helloworld.proto
 
 .PHONY: check-git
@@ -79,7 +79,7 @@ endif
 
 .PHONY: lint
 lint: ## Runs various static analysis against our code.
-lint: $(FAILLINT) $(GOLANGCI_LINT) $(MISSPELL) build format proto check-git deps
+lint: $(FAILLINT) $(GOLANGCI_LINT) $(MISSPELL)  format proto check-git deps build
 	@DIR="." $(MAKE) lint_module
 	@DIR=$(MODULE_EXAMPLES) $(MAKE) lint_module
 	@DIR=$(MODULE_GEN_GO) $(MAKE) lint_module

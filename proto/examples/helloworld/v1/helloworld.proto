@@ -3,7 +3,7 @@ syntax = "proto3";
 import "protoconfig/v1/extensions.proto";
 import "protoconfig/go/kingpinv2/v1/extensions.proto";
 
-option go_package = "github.com/protoconfig/protoconfig/go/examples/helloworld;helloworldpb";
+option go_package = "github.com/openproto/protoconfig/go/examples/helloworld;helloworldpb";
 option java_multiple_files = true;
 option java_package = "com.github.protoconfig.examples.helloworld";
 option java_outer_classname = "HelloWorldProto";
@@ -33,7 +33,7 @@ enum Lang {
 }
 
 message HelloCommand {
-    option (protoconfig.golang.kingpinv2.v1.command) = {name :"hello" };
+    option (protoconfig.go.kingpinv2.v1.command) = {name :"hello" };
 
     string name = 1 [(protoconfig.v1.required) = true];
     int64 year = 2 [(protoconfig.v1.default) = "2021"];
@@ -45,7 +45,7 @@ message HelloCommand {
 }
 
 message ByeCommand {
-    option (protoconfig.golang.kingpinv2.v1.command) = {name :"bye" };
+    option (protoconfig.go.kingpinv2.v1.command) = {name :"bye" };
 
     Lang lang = 1;
     oneof command {
@@ -55,11 +55,11 @@ message ByeCommand {
 }
 
 message ByeJustCommand {
-    option (protoconfig.golang.kingpinv2.v1.command) = {name :"just" };
+    option (protoconfig.go.kingpinv2.v1.command) = {name :"just" };
 }
 
 message ByeConfigurableCommand {
-    option (protoconfig.golang.kingpinv2.v1.command) = {name :"configurable" };
+    option (protoconfig.go.kingpinv2.v1.command) = {name :"configurable" };
 
     string config_id = 1;
     ByeConfiguration config = 2;

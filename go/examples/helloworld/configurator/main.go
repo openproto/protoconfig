@@ -6,8 +6,8 @@ import (
 	"os"
 	"os/exec"
 
-	protoconfig "github.com/protoconfig/protoconfig/go"
-	helloworldpb "github.com/protoconfig/protoconfig/go/examples/helloworld"
+	protoconfig "github.com/openproto/protoconfig/go"
+	helloworldpb "github.com/openproto/protoconfig/go/examples/helloworld"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )

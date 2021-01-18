@@ -1,8 +1,8 @@
 package main
 
 import (
+	protoconfig "github.com/openproto/protoconfig/go"
 	"github.com/pkg/errors"
-	protoconfig "github.com/protoconfig/protoconfig/go"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -14,7 +14,7 @@ const (
 	ioPackage         = protogen.GoImportPath("io")
 	protoPackage      = protogen.GoImportPath("google.golang.org/protobuf/proto")
 	protojsonPackage  = protogen.GoImportPath("google.golang.org/protobuf/encoding/protojson")
-	openConfigPackage = protogen.GoImportPath("github.com/protoconfig/protoconfig/go")
+	openConfigPackage = protogen.GoImportPath("github.com/openproto/protoconfig/go")
 )
 
 // generateGoProtoConfig generates a _protoconfig.pb.go file containing a code of Congfigurator and Configurable (based on https://github.com/urfave/cli/), based
@@ -157,7 +157,7 @@ func generateConfiguratorSide(g *protogen.GeneratedFile, c *protoconfig.Metadata
 }
 
 // While it's not mandatory, ProtoConfig 1.0 generates stub for defining Go CLI application that user might or might not use.
-// In order to use it external CLI builder is necessary. For example kingpin.v2 implementation see github.com/protoconfig/protoconfig/go/kingpinv2.
+// In order to use it external CLI builder is necessary. For example kingpin.v2 implementation see github.com/openproto/protoconfig/go/kingpinv2.
 //
 // Such app will be compatible with defined configuration and will output such filled typed after parsing.
 func generateConfigurableSide(g *protogen.GeneratedFile, _ *protoconfig.Metadata, root *protogen.Message) {

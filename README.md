@@ -1,6 +1,6 @@
 # ProtoConfig 1.0
 
-[![golang docs](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/protoconfig/protoconfig/go) [![Latest Release](https://img.shields.io/github/release/protoconfig/protoconfig.svg?style=flat-square)](https://github.com/protoconfig/protoconfig/releases/latest)
+[![golang docs](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/openproto/protoconfig/go) [![Latest Release](https://img.shields.io/github/release/openproto/protoconfig.svg?style=flat-square)](https://github.com/openproto/protoconfig/releases/latest)
 
 The `ProtoConfig 1.0` is an open, language agnostic specification that describes a process of using, defining, and consuming software configuration input in a unified way.
 

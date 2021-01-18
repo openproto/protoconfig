@@ -5,7 +5,7 @@ package helloworldpb
 import (
 	bytes "bytes"
 	fmt "fmt"
-	_go "github.com/protoconfig/protoconfig/go"
+	_go "github.com/openproto/protoconfig/go"
 	protojson "google.golang.org/protobuf/encoding/protojson"
 	proto "google.golang.org/protobuf/proto"
 )
@@ -31,24 +31,24 @@ func NewByeConfigurableCommand(x *ByeConfigurableCommand) *ByeCommand_Configurab
 }
 
 // Encode encodes self as `Encoded Configuration Message` in proto format so it can be understood and
-// passed to Configurable struct. It supports all `ProtoProto Config Extensions Format 1.0` extenstion
+// passed to Configurable struct. It supports all `Proto Config Extensions Format 1.0` extenstion
 // (validation, default values etc).
 // Use `proto.Marshal` encoding without `ProtoConfig 1.0` extension support.
 func (x *HelloWorldConfiguration) Encode() ([]byte, error) {
-	// TODO(bwplotka): Actually implement validation for `ProtoProto Config Extensions Format 1.0` (:
+	// TODO(bwplotka): Actually implement validation for `Proto Config Extensions Format 1.0` (:
 	return proto.Marshal(x)
 }
 
 // EncodeJSON encodes self as `Encoded Configuration Message` in JSON format so it can be understood and
-// passed to Configurable struct. It supports all `ProtoProto Config Extensions Format 1.0` extenstion
+// passed to Configurable struct. It supports all `Proto Config Extensions Format 1.0` extenstion
 // (validation, default values etc).
 // Use `protojson.Marshal` encoding without `ProtoConfig 1.0` extension support.
 func (x *HelloWorldConfiguration) EncodeJSON() ([]byte, error) {
-	// TODO(bwplotka): Actually implement validation for `ProtoProto Config Extensions Format 1.0` (:
+	// TODO(bwplotka): Actually implement validation for `Proto Config Extensions Format 1.0` (:
 	return protojson.Marshal(x)
 }
 
-// Metadata returns metadata defined in `ProtoProto Config Extensions Format 1.0`.
+// Metadata returns metadata defined in `Proto Config Extensions Format 1.0`.
 func (x *HelloWorldConfiguration) Metadata() _go.Metadata {
 	return _go.Metadata{
 		Name:              "configurable",
@@ -71,11 +71,11 @@ func (x *HelloWorldConfiguration) CommandLineArgument() (string, error) {
 var _ _go.Configurator = &HelloWorldConfiguration{}
 
 // Decode parses byte slice as `Encoded Configuration Message` in JSON or proto format and unmarshal it on
-// the Configurable struct. It supports all `ProtoProto Config Extensions Format 1.0` extenstion
+// the Configurable struct. It supports all `Proto Config Extensions Format 1.0` extenstion
 // (validation, default values etc).
 // Use `proto.Unmarshal` or `protojson.Unmarshal` for decoding without `ProtoConfig 1.0` extension support.
 func (x *HelloWorldConfiguration) Decode(ecm []byte) error {
-	// TODO(bwplotka): Actually implement validation for `ProtoProto Config Extensions Format 1.0` (:
+	// TODO(bwplotka): Actually implement validation for `Proto Config Extensions Format 1.0` (:
 	if isJSON(ecm) {
 		return protojson.Unmarshal(ecm, x)
 	}
@@ -83,7 +83,7 @@ func (x *HelloWorldConfiguration) Decode(ecm []byte) error {
 }
 
 // DecodeString parses string as `Encoded Configuration Message` in JSON or proto format and unmarshal it on
-// the Configurable struct. It supports all `ProtoProto Config Extensions Format 1.0` extenstion
+// the Configurable struct. It supports all `Proto Config Extensions Format 1.0` extenstion
 // (validation, default values etc).
 // Use `proto.Unmarshal` or `protojson.Unmarshal` for decoding without `ProtoConfig 1.0` extension support.
 func (x *HelloWorldConfiguration) DecodeString(ecm string) error {

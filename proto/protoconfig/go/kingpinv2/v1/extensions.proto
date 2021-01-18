@@ -1,9 +1,9 @@
 syntax = "proto3";
 
 // Extensions based on https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2
-package protoconfig.golang.kingpinv2.v1;
+package protoconfig.go.kingpinv2.v1;
 
-option go_package = "github.com/protoconfig/protoconfig/go/kingpinv2;kingpinv2";
+option go_package = "github.com/openproto/protoconfig/go/kingpinv2;kingpinv2";
 
 import "google/protobuf/descriptor.proto";
 import "google/protobuf/any.proto";

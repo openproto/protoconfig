@@ -1,4 +1,4 @@
-module github.com/protoconfig/protoconfig/go
+module github.com/openproto/protoconfig/go
 
 go 1.15
 
