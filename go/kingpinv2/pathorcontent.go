@@ -90,9 +90,6 @@ func (f *Clause) PathOrContent() *PathOrContent {
 	if f.hiddenPath {
 		c = c.Hidden()
 	}
-	if f.required {
-		c = c.Required()
-	}
 	if f.defaultPath != "" {
 		// TODO(bwplotka): Add default to help.
 		c = c.Default(f.defaultPath)
@@ -102,9 +99,6 @@ func (f *Clause) PathOrContent() *PathOrContent {
 	c = f.cmd.Flag(contentFlagName, fmt.Sprintf("Alternative to '%s' flag (lower priority). Content of %s", pathFlagName, f.help))
 	if f.hiddenContent {
 		c = c.Hidden()
-	}
-	if f.required {
-		c = c.Required()
 	}
 	if f.defaultContent != "" {
 		// TODO(bwplotka): Add default to help.
