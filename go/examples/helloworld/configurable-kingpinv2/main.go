@@ -6,7 +6,7 @@ import (
 	"os"
 
 	helloworldpb "github.com/openproto/protoconfig/go/examples/helloworld"
-	"gopkg.in/alecthomas/kingpin.v2"
+	"github.com/alecthomas/kingpin/v2"
 )
 
 func main() {

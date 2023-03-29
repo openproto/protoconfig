@@ -38,9 +38,9 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
-/// Metadata is an Message option that when put on message indicates an entry point for certain configuration.
-/// One `Configuration Proto Definition` can have many structs marked as this option.
-/// TODO(bwplotka): Make it non pointers (in Go).
+// / Metadata is an Message option that when put on message indicates an entry point for certain configuration.
+// / One `Configuration Proto Definition` can have many structs marked as this option.
+// / TODO(bwplotka): Make it non pointers (in Go).
 type Metadata struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
