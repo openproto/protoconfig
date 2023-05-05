@@ -4,7 +4,7 @@
 // 	protoc        v3.13.0
 // source: protoconfig/go/kingpinv2/v1/extensions.proto
 
-// Extensions based on https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2
+// Extensions based on https://pkg.go.dev/github.com/alecthomas/kingpin/v2
 
 package kingpinv2
 
@@ -77,8 +77,8 @@ func (x *Content) GetContent() *any.Any {
 	return nil
 }
 
-// ExistingFile represents https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2#ArgClause.ExistingFile.
-// repeated ExistingFile represents https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2#ArgClause.ExistingFiles.
+// ExistingFile represents https://pkg.go.dev/github.com/alecthomas/kingpin/v2#ArgClause.ExistingFile.
+// repeated ExistingFile represents https://pkg.go.dev/github.com/alecthomas/kingpin/v2#ArgClause.ExistingFiles.
 type ExistingFile struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -126,8 +126,8 @@ func (x *ExistingFile) GetFile() *any.Any {
 	return nil
 }
 
-// IP represents https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2#ArgClause.IP.
-// repeated IP represents https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2#ArgClause.IPList.
+// IP represents https://pkg.go.dev/github.com/alecthomas/kingpin/v2#ArgClause.IP.
+// repeated IP represents https://pkg.go.dev/github.com/alecthomas/kingpin/v2#ArgClause.IPList.
 type IP struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -175,8 +175,8 @@ func (x *IP) GetIp() *any.Any {
 	return nil
 }
 
-// Regexp represents https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2#ArgClause.Regexp.
-// repeated Regexp represents https://pkg.go.dev/gopkg.in/alecthomas/kingpin.v2#ArgClause.RegexpList.
+// Regexp represents https://pkg.go.dev/github.com/alecthomas/kingpin/v2#ArgClause.Regexp.
+// repeated Regexp represents https://pkg.go.dev/github.com/alecthomas/kingpin/v2#ArgClause.RegexpList.
 type Regexp struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
