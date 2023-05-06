@@ -7,10 +7,7 @@ require (
 	google.golang.org/protobuf v1.25.0
 )
 
-require (
-	github.com/golang/protobuf v1.4.3 // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-)
+require golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 
 // TODO(bwplotka): Remove once dev period completes.
 replace github.com/openproto/protoconfig/go => ../
