@@ -4,7 +4,6 @@ go 1.19
 
 require (
 	github.com/alecthomas/kingpin/v2 v2.3.2
-	github.com/golang/protobuf v1.4.3
 	github.com/openproto/protoconfig/go v0.0.0-00010101000000-000000000000
 	google.golang.org/protobuf v1.25.0
 )
