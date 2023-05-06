@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	helloworldpb "github.com/openproto/protoconfig/go/examples/helloworld"
 	"github.com/alecthomas/kingpin/v2"
+	helloworldpb "github.com/openproto/protoconfig/go/examples/helloworld"
 )
 
 func main() {

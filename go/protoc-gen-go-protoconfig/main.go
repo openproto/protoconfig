@@ -1,10 +1,13 @@
-//  protoc-gen-go-protoconfig is a plugin for the Google protocol buffer compiler to
+//	protoc-gen-go-protoconfig is a plugin for the Google protocol buffer compiler to
+//
 // generate Go code. Install it by building this program and making it
 // accessible within your PATH with the name:
-//	 protoc-gen-go-protoconfig
+//
+//	protoc-gen-go-protoconfig
 //
 // The 'go-protoconfig' suffix becomes part of the argument for the protocol compiler,
 // such that it can be invoked as:
+//
 //	protoc --go-protoconfig_out=. path/to/file.proto
 //
 // This generates Go configuration definitions for the protocol buffer defined by
