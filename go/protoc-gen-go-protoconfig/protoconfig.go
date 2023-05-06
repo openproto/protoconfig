@@ -1,8 +1,9 @@
 package main
 
 import (
+	"fmt"
+
 	protoconfig "github.com/openproto/protoconfig/go"
-	"github.com/pkg/errors"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -29,7 +30,7 @@ func generateGoProtoConfig(gen *protogen.Plugin, file *protogen.File) error {
 		e := proto.GetExtension(f.Desc.Options().(*descriptorpb.MessageOptions), protoconfig.E_Metadata)
 		c, ok := e.(*protoconfig.Metadata)
 		if !ok {
-			return errors.Errorf("unexpected type; got %T expected protoconfig.Configuration", e)
+			return fmt.Errorf("unexpected type; got %T expected protoconfig.Configuration", e)
 		}
 		// Such extension is not specified.
 		if c == nil {

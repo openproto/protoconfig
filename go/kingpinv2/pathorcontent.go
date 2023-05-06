@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 
 	"github.com/alecthomas/kingpin/v2"
-	"github.com/pkg/errors"
 )
 
 // Clause is a fluid interface used to build extended flags.
@@ -121,14 +120,14 @@ func (p *PathOrContent) Content() ([]byte, error) {
 	fileFlagName := fmt.Sprintf("%s-file", p.flagName)
 
 	if len(*p.path) > 0 && len(*p.content) > 0 {
-		return nil, errors.Errorf("both %s and %s flags set.", fileFlagName, contentFlagName)
+		return nil, fmt.Errorf("both %s and %s flags set.", fileFlagName, contentFlagName)
 	}
 
 	var content []byte
 	if len(*p.path) > 0 {
 		c, err := ioutil.ReadFile(*p.path)
 		if err != nil {
-			return nil, errors.Wrapf(err, "loading YAML file %s for %s", *p.path, fileFlagName)
+			return nil, fmt.Errorf("loading YAML file %s for %s error: %w", *p.path, fileFlagName, err)
 		}
 		content = c
 	} else {
@@ -136,7 +135,7 @@ func (p *PathOrContent) Content() ([]byte, error) {
 	}
 
 	if len(content) == 0 && p.required {
-		return nil, errors.Errorf("flag %s or %s is required for running this command and content cannot be empty.", fileFlagName, contentFlagName)
+		return nil, fmt.Errorf("flag %s or %s is required for running this command and content cannot be empty.", fileFlagName, contentFlagName)
 	}
 
 	return content, nil
