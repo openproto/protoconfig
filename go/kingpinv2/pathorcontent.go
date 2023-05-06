@@ -2,7 +2,7 @@ package kingpinv2
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/alecthomas/kingpin/v2"
 )
@@ -125,7 +125,7 @@ func (p *PathOrContent) Content() ([]byte, error) {
 
 	var content []byte
 	if len(*p.path) > 0 {
-		c, err := ioutil.ReadFile(*p.path)
+		c, err := os.ReadFile(*p.path)
 		if err != nil {
 			return nil, fmt.Errorf("loading YAML file %s for %s error: %w", *p.path, fileFlagName, err)
 		}
