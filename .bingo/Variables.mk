@@ -35,12 +35,6 @@ $(FAILLINT): $(BINGO_DIR)/faillint.mod
 	@echo "(re)installing $(GOBIN)/faillint-v1.11.0"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=faillint.mod -o=$(GOBIN)/faillint-v1.11.0 "github.com/fatih/faillint"
 
-GOIMPORTS := $(GOBIN)/goimports-v0.8.0
-$(GOIMPORTS): $(BINGO_DIR)/goimports.mod
-	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/goimports-v0.8.0"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=goimports.mod -o=$(GOBIN)/goimports-v0.8.0 "golang.org/x/tools/cmd/goimports"
-
 GOLANGCI_LINT := $(GOBIN)/golangci-lint-v1.51.2
 $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
